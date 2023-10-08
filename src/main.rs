@@ -1,7 +1,3 @@
-//! ## Demo
-//!
-//! `Demo` shows how to use tui-realm in a real case
-
 extern crate tuirealm;
 
 use std::env;

@@ -1,7 +1,3 @@
-//! ## Components
-//!
-//! demo example components
-
 use super::Msg;
 
 use tuirealm::props::{Alignment, Borders, Color, Style};

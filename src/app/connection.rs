@@ -24,7 +24,7 @@ impl Connection {
     pub(crate) async fn connect(name: &str, url: &str) -> Result<Self, sqlx::Error> {
         let opts: PgConnectOptions = url.parse()?;
         let opts = opts.database(&name);
-        log::info!("Connecting to database: {:?}", opts);
+        tracing::info!("Connecting to database: {:?}", opts);
         let connection = PgConnection::connect_with(&opts).await?;
         // let connection = PgConnection::connect(&url).await?;
         let connection = TypedConnection::Postgres(connection);
@@ -93,7 +93,7 @@ impl ConnectionsManager {
     }
 
     fn process_db_error(error: sqlx::Error, id: Uuid) -> DbResponse {
-        log::error!("Error executing query: {:?}", error);
+        tracing::error!("Error executing query: {:?}", error);
         match error {
             sqlx::Error::Database(db_error) => {
                 return DbResponse::Error(id, db_error.message().to_string())
@@ -167,7 +167,7 @@ impl ConnectionsManager {
                     self.tx.send(response).unwrap();
                 }
                 Err(e) => {
-                    log::error!("Error receiving request from main thread: {:?}", e);
+                    tracing::error!("Error receiving request from main thread: {:?}", e);
                 }
             }
         }
@@ -179,7 +179,7 @@ impl ConnectionsManager {
         id: Uuid,
         name: String,
     ) -> Result<(Vec<String>, Vec<Vec<String>>), sqlx::Error> {
-        log::info!("Executing query: {}", query);
+        tracing::info!("Executing query: {}", query);
         let key = ConnectionKey {
             name,
             server_id: id,
@@ -221,7 +221,7 @@ impl ConnectionsManager {
                                 // println!("{}: {:?}", col.name(), val);
                                 data.push(val);
                             } else {
-                                log::warn!("Unknown oid: {}, try bind to string", oid);
+                                tracing::warn!("Unknown oid: {}, try bind to string", oid);
                                 let val: String = row.get::<String, usize>(i);
                                 data.push(val);
                             }

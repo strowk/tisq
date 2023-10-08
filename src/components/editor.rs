@@ -122,7 +122,7 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
     fn on(&mut self, ev: Event<TisqEvent>) -> Option<Msg> {
         let alt_control: KeyModifiers = KeyModifiers::ALT.bitor(KeyModifiers::CONTROL);
         let cntrl_shift: KeyModifiers = KeyModifiers::SHIFT.bitor(KeyModifiers::CONTROL);
-        // log::debug!("matching {:?}", ev);
+        // tracing::debug!("matching {:?}", ev);
         match ev {
             // Event::Keyboard(KeyEvent {
             //     code: Key::Left | Key::Right,

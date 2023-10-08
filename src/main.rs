@@ -1,8 +1,12 @@
 extern crate tuirealm;
 
 use std::env;
+use std::fs::File;
 
 use app::EditorId;
+use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::{fmt, EnvFilter};
 use tuirealm::application::PollStrategy;
 
 use tuirealm::{AttrValue, Attribute, Update};
@@ -85,12 +89,24 @@ fn main() -> eyre::Result<()> {
         }
     }
 
-    use log::LevelFilter;
-
     if debug_log {
-        simple_logging::log_to_file("debug.log", LevelFilter::Debug)?;
+        tracing_subscriber::registry()
+            .with(
+                fmt::layer()
+                    .with_ansi(false)
+                    .with_writer(File::create("debug.log").unwrap()),
+            )
+            .with(EnvFilter::from_default_env().add_directive("tisq=debug".parse()?))
+            .init();
     } else {
-        simple_logging::log_to_file("tisq-errors.log", LevelFilter::Error)?;
+        tracing_subscriber::registry()
+            .with(
+                fmt::layer()
+                    .with_ansi(false)
+                    .with_writer(File::create("tisq-errors.log").unwrap()),
+            )
+            .with(EnvFilter::from_default_env())
+            .init();
     }
 
     // Setup model

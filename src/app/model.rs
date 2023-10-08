@@ -97,7 +97,7 @@ impl Default for Model {
                     back_dispatcher.dispatch(Event::User(TisqEvent::DbResponse(response)));
                 }
                 Err(e) => {
-                    log::error!("Error receiving response from connection manager: {:?}", e);
+                    tracing::error!("Error receiving response from connection manager: {:?}", e);
                 }
             }
         });
@@ -458,7 +458,7 @@ impl Model {
         // if let Some(editor_index) = editor_index {
         let editor_index = editor_index.unwrap();
         // if let Some(editor_index) = editor_index {
-        log::debug!("activating tab: {}", editor_index);
+        tracing::debug!("activating tab: {}", editor_index);
         self.app
             .attr(
                 &Id::EditorTabs,
@@ -480,7 +480,7 @@ impl Model {
             // TODO: probably need to use a different data structure to
             // not have to pop all items and insert in different order
 
-            log::debug!("moving from editor index: {}", editor_index);
+            tracing::debug!("moving from editor index: {}", editor_index);
             let to_pop = self.query_editors.len() - editor_index - 1;
 
             let mut popped = Vec::new();
@@ -489,7 +489,7 @@ impl Model {
                 popped.push((id, metadata));
             }
 
-            log::debug!("popped: {}", popped.len());
+            tracing::debug!("popped: {}", popped.len());
 
             let (target_id, target_metadata) = self.query_editors.pop_back_entry().unwrap();
 
@@ -500,11 +500,11 @@ impl Model {
                 self.query_editors.insert(target_id, target_metadata);
             } else if increment < 0 {
                 if let Some((id, metadata)) = self.query_editors.pop_back_entry() {
-                    log::debug!("inserting target and previous");
+                    tracing::debug!("inserting target and previous");
                     self.query_editors.insert(target_id, target_metadata);
                     self.query_editors.insert(id, metadata);
                 } else {
-                    log::debug!("inserting target only");
+                    tracing::debug!("inserting target only");
                     self.query_editors.insert(target_id, target_metadata);
                 }
             } else {
@@ -601,12 +601,12 @@ impl Update<Msg> for Model {
                     None
                 }
                 Msg::MoveTabRight(editor_id) => {
-                    log::debug!("moving tab right");
+                    tracing::debug!("moving tab right");
                     self.move_editor_tab(&editor_id, 1);
                     None
                 }
                 Msg::MoveTabLeft(editor_id) => {
-                    log::debug!("moving tab left");
+                    tracing::debug!("moving tab left");
                     self.move_editor_tab(&editor_id, -1);
                     None
                 }
@@ -714,7 +714,7 @@ impl Update<Msg> for Model {
                     let server_id = match Uuid::parse_str(server_id) {
                         Ok(server_id) => server_id,
                         Err(_) => {
-                            log::error!("invalid server id: {}", server_id);
+                            tracing::error!("invalid server id: {}", server_id);
                             return None;
                         }
                     };

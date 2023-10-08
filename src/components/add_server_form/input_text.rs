@@ -33,7 +33,7 @@ impl InputText {
 
 impl Component<Msg, TisqEvent> for InputText {
     fn on(&mut self, ev: Event<TisqEvent>) -> Option<Msg> {
-        log::debug!("InputText Event: {:?}", ev);
+        tracing::debug!("InputText Event: {:?}", ev);
         let _ = match ev {
             Event::Keyboard(KeyEvent {
                 code: Key::Up,

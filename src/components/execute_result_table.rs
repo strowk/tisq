@@ -116,7 +116,7 @@ impl ExecuteResultTable {
             .iter()
             .enumerate()
             .for_each(|(i, col)| update_widths(&mut absolute_widths, col, i));
-        // log::debug!("widths: {:?}", widths);
+        // tracing::debug!("widths: {:?}", widths);
         let total = absolute_widths.iter().sum::<u16>();
 
         // transform to percentages

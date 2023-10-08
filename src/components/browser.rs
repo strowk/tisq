@@ -108,7 +108,7 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                 server_id,
                 databases,
             ))) => {
-                // log::debug!("Databases listed: {:?}", databases);
+                // tracing::debug!("Databases listed: {:?}", databases);
                 {
                     let tree = self.component.tree_mut();
                     let tree_id = BrowserTreeId::Server(server_id.to_string());
@@ -180,7 +180,7 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                     let server_id = match Uuid::parse_str(&server_id) {
                         Ok(uuid) => uuid,
                         Err(_) => {
-                            log::error!("Could not parse server id: {}", server_id);
+                            tracing::error!("Could not parse server id: {}", server_id);
                             return Some(Msg::None);
                         }
                     };
@@ -215,7 +215,7 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                             match Uuid::parse_str(&server_id) {
                                 Ok(uuid) => return Some(Msg::OpenConnection(uuid)),
                                 Err(_) => {
-                                    log::error!("Could not parse server id: {}", server_id);
+                                    tracing::error!("Could not parse server id: {}", server_id);
                                     return Some(Msg::None);
                                 }
                             }

@@ -32,10 +32,10 @@ tui-realm-treeview = { git = "https://github.com/strowk/tui-realm-treeview.git",
 sqlx = { version = "0.7", features = [ "runtime-async-std", "tls-rustls", "postgres" ] }
 async-std = "1.12.0"
 futures = "0.3.28"
-log = "0.4.20"
-simple-logging = "2.0.2"
 ordered_hash_map = "0.2.0"
 itertools = "0.11.0"
+tracing-subscriber = { version = "0.3.17", features = ["env-filter", "fmt"] }
+tracing = "0.1.37"
 # tui-realm-treeview = "^1.1.0"
 
 [dependencies.uuid]

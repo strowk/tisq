@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - `--version` flag to print version.
 
-## [v0.1.0] - 2023-05-09
+## [v0.1.0] - 2023-10-08
 
 ### Added
 

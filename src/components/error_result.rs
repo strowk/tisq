@@ -33,7 +33,9 @@ pub(crate) struct ErrorResult {
 impl Default for ErrorResult {
     fn default() -> Self {
         Self {
-            component: Paragraph::default().borders(Borders::default().sides(BorderSides::NONE)),
+            component: Paragraph::default()
+                .borders(Borders::default().sides(BorderSides::NONE))
+                .title("Execution Error", Alignment::Center),
         }
     }
 }

@@ -10,13 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- new `ctrl+r` shortcut to execute (to avoid clashing with VS Code).
+- New `ctrl+r` shortcut to execute (to avoid clashing with VS Code).
+- Title for execute error panel.
 
 ## [v0.1.2] - 2023-10-08
 
 ### Added
 
-- new `ctrl+e` shortcut to execute.
+- New `ctrl+e` shortcut to execute.
 
 ## [v0.1.1] - 2023-10-08
 

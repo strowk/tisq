@@ -51,5 +51,5 @@ Only Postgres is supported at the moment and with very limited set of types.
 ### Query editor
 
 - Ctrl+Alt+Enter / Ctrl+E - execute query
-- Cntrl+PageUp, Cntrl+PageDown - switch between tabs
+- Ctrl+PageUp, Ctrl+PageDown - switch between tabs
 

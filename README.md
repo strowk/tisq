@@ -50,6 +50,6 @@ Only Postgres is supported at the moment and with very limited set of types.
 
 ### Query editor
 
-- Ctrl+Alt+Enter / Ctrl+E - execute query
+- Ctrl+Alt+Enter / Ctrl+E / Ctrl+R - execute query
 - Ctrl+PageUp, Ctrl+PageDown - switch between tabs
 

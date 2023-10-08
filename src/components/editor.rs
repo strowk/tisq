@@ -178,6 +178,11 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
                 kind: KeyEventKind::Press,
                 modifiers: KeyModifiers::CONTROL,
             }) => Some(self.execute_message()),
+            Event::Keyboard(KeyEvent {
+                code: Key::Char('r'),
+                kind: KeyEventKind::Press,
+                modifiers: KeyModifiers::CONTROL,
+            }) => Some(self.execute_message()),
             // Event::Keyboard(KeyEvent {
             //     code: Key::Esc,
             //     kind: KeyEventKind::Press,

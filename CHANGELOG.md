@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- new `ctrl+r` shortcut to execute (to avoid clashing with VS Code).
+
 ## [v0.1.2] - 2023-10-08
 
 ### Added

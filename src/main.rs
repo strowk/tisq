@@ -103,7 +103,7 @@ fn main() -> eyre::Result<()> {
             .with(
                 fmt::layer()
                     .with_ansi(false)
-                    .with_writer(File::create("tisq-errors.log").unwrap()),
+                    .with_writer(|| File::create("tisq-errors.log").unwrap()),
             )
             .with(EnvFilter::from_default_env())
             .init();
@@ -111,6 +111,7 @@ fn main() -> eyre::Result<()> {
 
     // Setup model
     let mut model = Model::default();
+
     // Enter alternate screen
     let _ = model.terminal.enter_alternate_screen();
     let _ = model.terminal.enable_raw_mode();

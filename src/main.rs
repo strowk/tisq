@@ -4,6 +4,8 @@
 
 extern crate tuirealm;
 
+use std::env;
+
 use app::EditorId;
 use tuirealm::application::PollStrategy;
 
@@ -68,7 +70,16 @@ pub enum Id {
     ExecuteErrorResult,
 }
 
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
 fn main() -> eyre::Result<()> {
+    let args: Vec<_> = env::args().collect();
+    if args.len() > 1 {
+        if args[1] == "--version" {
+            println!("tui-realm demo v{}", VERSION);
+            return Ok(());
+        }
+    }
     use log::LevelFilter;
 
     simple_logging::log_to_file("debug.log", LevelFilter::Debug)?;

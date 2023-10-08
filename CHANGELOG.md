@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- `--version` flag to print version.
+
+## [v0.1.0] - 2023-05-09
+
+### Added
+
 - Initial release.
 - Supported limited set of Postgres types.
 - Tree view to browse servers and databases.

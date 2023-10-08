@@ -10,7 +10,17 @@ Features:
 
 ## Installation
 
-Only installation from sources is supported at the moment.
+# With script
+
+In bash shell run:
+
+```bash
+curl -s https://raw.githubusercontent.com/strowk/tisq/main/install.sh | bash
+```
+
+Tested on Linux bash and Windows Git Bash.
+
+## From sources
 
 ```bash
 git clone https://github.com/strowk/tisq
@@ -38,6 +48,6 @@ delete - delete server
 
 ### Query editor
 
-Ctrl+Alt+Enter - execute query
+Ctrl+Alt+Enter / Ctrl+E - execute query
 Cntrl+PageUp, Cntrl+PageDown - switch between tabs
 

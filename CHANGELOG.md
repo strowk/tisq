@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- new `ctrl+e` shortcut to execute.
+
 ## [v0.1.1] - 2023-10-08
 
 ### Added

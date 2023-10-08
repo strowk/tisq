@@ -1,5 +1,5 @@
-use std::ops::BitOr;
 use itertools::Itertools;
+use std::ops::BitOr;
 #[cfg(feature = "search")]
 use tuirealm::StateValue;
 use tuirealm::{
@@ -96,7 +96,6 @@ impl<'a> Editor<'a> {
     }
 
     fn get_text(&self) -> Option<String> {
-
         match self.component.state() {
             State::Vec(vector) => Some(
                 vector
@@ -109,6 +108,13 @@ impl<'a> Editor<'a> {
             ),
             _ => return None,
         }
+    }
+
+    fn execute_message(&mut self) -> Msg {
+        Msg::ExecuteQuery(
+            self.editor_id.clone(),
+            self.get_text().unwrap_or("".to_string()),
+        )
     }
 }
 
@@ -165,11 +171,13 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
             Event::Keyboard(KeyEvent {
                 code: Key::Enter,
                 kind: KeyEventKind::Press,
-                modifiers, // modifiers: KeyModifiers::ALT,
-            }) if (modifiers == alt_control) => Some(Msg::ExecuteQuery(
-                self.editor_id.clone(),
-                self.get_text().unwrap_or("".to_string()),
-            )),
+                modifiers,
+            }) if (modifiers == alt_control) => Some(self.execute_message()),
+            Event::Keyboard(KeyEvent {
+                code: Key::Char('e'),
+                kind: KeyEventKind::Press,
+                modifiers: KeyModifiers::CONTROL,
+            }) => Some(self.execute_message()),
             // Event::Keyboard(KeyEvent {
             //     code: Key::Esc,
             //     kind: KeyEventKind::Press,

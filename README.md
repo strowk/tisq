@@ -37,19 +37,19 @@ Only Postgres is supported at the moment and with very limited set of types.
 
 ### Global
 
-Escape - quit
-Alt+Left, Alt+Right - navigation
+- Escape - quit
+- Alt+Left, Alt+Right - navigation
 
 ### Tree view
 
-Up, Down - navigate
-Right - open node
-Left - close node
-a - add server
-delete - delete server
+- Up, Down - navigate
+- Right - open node
+- Left - close node
+- a - add server
+- delete - delete server
 
 ### Query editor
 
-Ctrl+Alt+Enter / Ctrl+E - execute query
-Cntrl+PageUp, Cntrl+PageDown - switch between tabs
+- Ctrl+Alt+Enter / Ctrl+E - execute query
+- Cntrl+PageUp, Cntrl+PageDown - switch between tabs
 

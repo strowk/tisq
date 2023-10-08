@@ -124,11 +124,11 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
         let cntrl_shift: KeyModifiers = KeyModifiers::SHIFT.bitor(KeyModifiers::CONTROL);
         // log::debug!("matching {:?}", ev);
         match ev {
-            Event::Keyboard(KeyEvent {
-                code: Key::Left | Key::Right,
-                kind: KeyEventKind::Press,
-                modifiers: KeyModifiers::ALT,
-            }) => Some(Msg::ChangeFocus(Id::Tree)),
+            // Event::Keyboard(KeyEvent {
+            //     code: Key::Left | Key::Right,
+            //     kind: KeyEventKind::Press,
+            //     modifiers: KeyModifiers::ALT,
+            // }) => Some(Msg::ChangeFocus(Id::Tree)),
             // These didn't work, should allow to customize key bindings
             // Event::Keyboard(
             //     key @ KeyEvent {

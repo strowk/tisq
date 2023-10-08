@@ -4,8 +4,8 @@
 
 use crate::app::event_dispatcher::EventDispatcherPort;
 use crate::components::{
-    AddServerForm, BrowserTree, Editor, EditorTabs, ExecuteResultTable, FormSubmitListener,
-    GlobalListener, InputText, SentTree, ACTIVE_TAB_INDEX, ErrorResult,
+    AddServerForm, BrowserTree, Editor, EditorTabs, ErrorResult, ExecuteResultTable,
+    FormSubmitListener, GlobalListener, InputText, SentTree, ACTIVE_TAB_INDEX,
 };
 
 use super::connection::{self, DbRequest, DbResponse};
@@ -419,14 +419,7 @@ impl Model {
             .mount(
                 Id::GlobalListener,
                 Box::new(GlobalListener::default()),
-                vec![Sub::new(
-                    SubEventClause::Keyboard(KeyEvent {
-                        code: Key::Esc,
-                        modifiers: KeyModifiers::NONE,
-                        kind: KeyEventKind::Press
-                    }),
-                    SubClause::Always
-                )]
+                GlobalListener::subscriptions()
             )
             .is_ok());
 
@@ -594,6 +587,11 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
+                Msg::NavigateRight | Msg::NavigateLeft => match self.app.focus() {
+                    Some(&Id::Tree) => Some(Msg::ChangeFocus(Id::EditorPanel)),
+                    Some(&Id::Editor(_)) => Some(Msg::ChangeFocus(Id::Tree)),
+                    _ => None,
+                },
                 Msg::ShowErrorResult => {
                     self.execute_result_state = ExecuteResultState::Error;
                     None

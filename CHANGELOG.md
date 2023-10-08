@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - New `ctrl+r` shortcut to execute (to avoid clashing with VS Code).
 - Title for execute error panel.
+- Only log errors to tisq-errors.log file.
+- Log everything in debug.log if `--debug` flag is passed.
+- Add Ctrl+Alt+Left and Ctrl+Alt+Right shortcuts to switch between panels (to avoid clashing with VS Code).
 
 ## [v0.1.2] - 2023-10-08
 

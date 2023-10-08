@@ -20,6 +20,9 @@ pub(crate) enum Msg {
     ExecuteQuery(EditorId, String),
     ChangeFocus(Id),
 
+    NavigateRight,
+    NavigateLeft,
+
     PreviousEditor,
     NextEditor,
     MoveTabLeft(EditorId),
@@ -70,15 +73,25 @@ const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 fn main() -> eyre::Result<()> {
     let args: Vec<_> = env::args().collect();
+    let mut debug_log = false;
     if args.len() > 1 {
         if args[1] == "--version" {
             println!("tisq v{}", VERSION);
             return Ok(());
         }
+
+        if args[1] == "--debug" {
+            debug_log = true;
+        }
     }
+
     use log::LevelFilter;
 
-    simple_logging::log_to_file("debug.log", LevelFilter::Debug)?;
+    if debug_log {
+        simple_logging::log_to_file("debug.log", LevelFilter::Debug)?;
+    } else {
+        simple_logging::log_to_file("tisq-errors.log", LevelFilter::Error)?;
+    }
 
     // Setup model
     let mut model = Model::default();

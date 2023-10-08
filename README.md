@@ -38,7 +38,7 @@ Only Postgres is supported at the moment and with very limited set of types.
 ### Global
 
 - Escape - quit
-- Alt+Left, Alt+Right - navigation
+- Alt+Left, Alt+Right / Ctrl+Alt+Left, Ctrl+Alt+Right - navigation
 
 ### Tree view
 

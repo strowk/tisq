@@ -193,11 +193,11 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                 kind: KeyEventKind::Press,
                 modifiers: KeyModifiers::NONE,
             }) => return Some(Msg::StartAddingServer),
-            Event::Keyboard(KeyEvent {
-                code: Key::Left | Key::Right,
-                kind: KeyEventKind::Press,
-                modifiers: KeyModifiers::ALT,
-            }) => return Some(Msg::ChangeFocus(Id::EditorPanel)),
+            // Event::Keyboard(KeyEvent {
+            //     code: Key::Left | Key::Right,
+            //     kind: KeyEventKind::Press,
+            //     modifiers: KeyModifiers::ALT,
+            // }) => return Some(Msg::ChangeFocus(Id::EditorPanel)),
             Event::Keyboard(KeyEvent {
                 code: Key::Left,
                 modifiers: KeyModifiers::NONE,

@@ -2,6 +2,8 @@
 
 TisQ [tɪz-kjuː] stands for **T**erminal **I**nterface for **S**QL **Q**ueries.
 
+!["gif recording"](./vhs/base.gif)
+
 Features:
 - Browse servers and databases in tree view.
 - Write and execute SQL queries.

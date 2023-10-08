@@ -166,8 +166,9 @@ impl ConnectionsManager {
                     let response = self.process_request(request);
                     self.tx.send(response).unwrap();
                 }
-                Err(e) => {
-                    tracing::error!("Error receiving request from main thread: {:?}", e);
+                Err(_e) => {
+                    // TODO: enable this back when understand how to ignore shutdown sequence
+                    // tracing::error!("Error receiving request from main thread: {:?}", e);
                 }
             }
         }

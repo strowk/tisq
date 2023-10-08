@@ -76,7 +76,7 @@ fn main() -> eyre::Result<()> {
     let args: Vec<_> = env::args().collect();
     if args.len() > 1 {
         if args[1] == "--version" {
-            println!("tui-realm demo v{}", VERSION);
+            println!("tisq v{}", VERSION);
             return Ok(());
         }
     }

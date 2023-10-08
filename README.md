@@ -10,7 +10,7 @@ Features:
 
 ## Installation
 
-# With script
+### With script
 
 In bash shell run:
 
@@ -20,7 +20,7 @@ curl -s https://raw.githubusercontent.com/strowk/tisq/main/install.sh | bash
 
 Tested on Linux bash and Windows Git Bash.
 
-## From sources
+### From sources
 
 ```bash
 git clone https://github.com/strowk/tisq

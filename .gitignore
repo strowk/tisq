@@ -1,6 +1,6 @@
 /target
 /storage
-debug.log
+tisq-debug.log
 tisq-errors.log
 prepare.sh
 docker-cache

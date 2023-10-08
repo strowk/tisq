@@ -44,12 +44,12 @@ jobs:
         with:
           version: ${{ (github.ref_type == 'tag' && !contains(github.ref_name, '-') && github.ref_name) || 'Unreleased' }}
           path: ./CHANGELOG.md
-      - name: Log into crates.io
-        if: github.event_name != 'pull_request'
-        run: cargo login -- ${{ secrets.CRATES_IO_TOKEN }}
-        shell: bash
       # as long as I am using customized libs and my patches are not in upstream,
       # publishing in crates would not work
+      # - name: Log into crates.io
+      #   if: github.event_name != 'pull_request'
+      #   run: cargo login -- ${{ secrets.CRATES_IO_TOKEN }}
+      #   shell: bash
       # - name: Publish crate
         # if: >
           # github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')

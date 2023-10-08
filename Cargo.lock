@@ -1985,6 +1985,7 @@ dependencies = [
  "futures",
  "itertools",
  "kv",
+ "once_cell",
  "ordered_hash_map",
  "serde",
  "serde_json",

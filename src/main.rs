@@ -1,9 +1,11 @@
 extern crate tuirealm;
 
+use std::collections::HashMap;
 use std::env;
 use std::fs::File;
 
 use app::EditorId;
+use once_cell::sync::Lazy;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{fmt, EnvFilter};
@@ -89,12 +91,15 @@ fn main() -> eyre::Result<()> {
         }
     }
 
+    static DEBUG_FILE: Lazy<Option<File>> = Lazy::new(|| Some(File::create("debug.log").unwrap()));
+    static ERROR_FILE: Lazy<Option<File>> =
+        Lazy::new(|| Some(File::create("tisq-errors.log").unwrap()));
     if debug_log {
         tracing_subscriber::registry()
             .with(
                 fmt::layer()
                     .with_ansi(false)
-                    .with_writer(File::create("debug.log").unwrap()),
+                    .with_writer(|| DEBUG_FILE.as_ref().unwrap()),
             )
             .with(EnvFilter::from_default_env().add_directive("tisq=debug".parse()?))
             .init();
@@ -103,7 +108,7 @@ fn main() -> eyre::Result<()> {
             .with(
                 fmt::layer()
                     .with_ansi(false)
-                    .with_writer(|| File::create("tisq-errors.log").unwrap()),
+                    .with_writer(|| ERROR_FILE.as_ref().unwrap()),
             )
             .with(EnvFilter::from_default_env())
             .init();

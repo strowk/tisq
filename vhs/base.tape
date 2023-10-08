@@ -58,14 +58,48 @@ Require tisq
 Set Shell "bash"
 Set TypingSpeed 0.03
 Set FontSize 28
-Set Width 1800
-Set Height 1000
-
+Set Width 2400
+Set Height 1400
 
 Sleep 500ms
-Type "tisq"
+Type "tisq" Sleep 500ms Enter
 
 Sleep 1s
+Type "a"
+
+Type "my-postgres"
 Down
+Type "postgres://postgres:kkiihhyywwfe1223@postgres:5432/test"
+
+Sleep 1s
+Enter
+
+Sleep 1s
+
+Right
+Sleep 1s
+Down
+Sleep 1s
+Right
+Sleep 1s
+
+Down
+Sleep 0.3
+
+Down
+Sleep 1s
+
+Type "q"
+
+Sleep 1
+
+Type "select * from test"
+
+Sleep 1
+
+Ctrl+e
+
+Sleep 4
+
 
 

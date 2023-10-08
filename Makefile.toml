@@ -1,14 +1,28 @@
 [env]
-CACHE_TO = { value = "type=local,dest=../../docker-cache", condition = { env_not_set = ["CACHE_TO"] } }
-CACHE_FROM = { value = "type=local,src=../../docker-cache", condition = { env_not_set = ["CACHE_FROM"] } }
+CACHE_TO = { value = "type=local,dest=../../docker-cache", condition = { env_not_set = [
+    "CACHE_TO",
+] } }
+CACHE_FROM = { value = "type=local,src=../../docker-cache", condition = { env_not_set = [
+    "CACHE_FROM",
+] } }
 
 [tasks.install]
 command = "cargo"
-args = [
-    "install",
-    "--path",
-    "./"
-]
+args = ["install", "--path", "./"]
+
+[tasks.vhs]
+cwd = "vhs"
+dependencies = ["build-linux_x86_64"]
+script_runner = "@shell"
+script = """
+set -e
+cp ../target/x86_64-unknown-linux-gnu/release/tisq ./tisq
+
+docker build -t vhs-tisq .
+docker run --rm --privileged --network tisq -v ${CARGO_MAKE_WORKING_DIRECTORY}:/vhs vhs-tisq ./base.tape
+rm -Rf ./storage 
+
+"""
 
 [tasks.test-coverage]
 command = "docker"
@@ -17,78 +31,57 @@ args = [
     "--security-opt",
     "seccomp=unconfined",
     "--rm",
-    "-v", 
+    "-v",
     "${CARGO_MAKE_WORKING_DIRECTORY}:/volume",
-    "xd009642/tarpaulin", 
-    "bash", 
+    "xd009642/tarpaulin",
+    "bash",
     "-c",
     """git config --global user.name 'Test Fella' \
     && git config --global user.email 'justfortest@domain.example' \
     && git config --global --add safe.directory /volume \
-    && cargo tarpaulin"""
+    && cargo tarpaulin""",
 ]
 
 # Cross builds for linux, windows and mac
 
 [tasks.install-cross]
 command = "cargo"
-args = [
-    "install",
-    "cross",
-    "--git",
-    "https://github.com/cross-rs/cross"
-]
+args = ["install", "cross", "--git", "https://github.com/cross-rs/cross"]
 
 [tasks.build-all]
 dependencies = [
     "build-linux_x86_64",
     "build-windows_x86_64",
     "build-mac_x86_64",
-    "build-mac_arm"
+    "build-mac_arm",
 ]
 
 # Building binary for linux x86_64
 [tasks.build-linux_x86_64]
 command = "cross"
-args = [
-    "build",
-    "--target",
-    "x86_64-unknown-linux-gnu",
-    "--release"
-]
+args = ["build", "--target", "x86_64-unknown-linux-gnu", "--release"]
 
 # Building binary for windows x86_64
 
 [tasks.build-windows_x86_64]
 command = "cross"
-args = [
-    "build",
-    "--target",
-    "x86_64-pc-windows-gnu",
-    "--release"
-]
+args = ["build", "--target", "x86_64-pc-windows-gnu", "--release"]
 
 # Building binaries for MacOS
 
 [tasks.clone-cross]
 condition = { files_not_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/cross"] }
 command = "git"
-args = [
-    "clone",
-    "https://github.com/cross-rs/cross.git"
-]
+args = ["clone", "https://github.com/cross-rs/cross.git"]
 
 [tasks.get-cross-toolchains]
-dependencies = [ "clone-cross" ]
+dependencies = ["clone-cross"]
 command = "git"
-condition = { files_not_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/docker/cross-toolchains/README.md"] }
+condition = { files_not_exist = [
+    "${CARGO_MAKE_WORKING_DIRECTORY}/docker/cross-toolchains/README.md",
+] }
 cwd = "./cross"
-args = [
-    "submodule",
-    "update",
-    "--init",
-    "--remote"
-]
+args = ["submodule", "update", "--init", "--remote"]
 
 [tasks.create-docker-engine]
 ignore_errors = true
@@ -99,11 +92,11 @@ args = [
     "--use",
     "--name",
     "docker-container",
-    "--driver=docker-container"
+    "--driver=docker-container",
 ]
 
 [tasks.cross-image-mac_arm]
-dependencies = [ "get-cross-toolchains", "create-docker-engine" ]
+dependencies = ["get-cross-toolchains", "create-docker-engine"]
 command = "cargo"
 cwd = "./cross"
 args = [
@@ -122,21 +115,16 @@ args = [
     "--ref-type",
     "branch",
     "--ref-name",
-    "main"
+    "main",
 ]
 
 [tasks.build-mac_arm]
-dependencies = [ "cross-image-mac_arm" ]
+dependencies = ["cross-image-mac_arm"]
 command = "cross"
-args = [
-    "build",
-    "--target",
-    "aarch64-apple-darwin",
-    "--release"
-]
+args = ["build", "--target", "aarch64-apple-darwin", "--release"]
 
 [tasks.cross-image-mac_x86_64]
-dependencies = [ "get-cross-toolchains", "create-docker-engine" ]
+dependencies = ["get-cross-toolchains", "create-docker-engine"]
 command = "cargo"
 cwd = "./cross"
 args = [
@@ -155,16 +143,10 @@ args = [
     "--ref-type",
     "branch",
     "--ref-name",
-    "main"
+    "main",
 ]
 
 [tasks.build-mac_x86_64]
-dependencies = [ "cross-image-mac_x86_64" ]
+dependencies = ["cross-image-mac_x86_64"]
 command = "cross"
-args = [
-    "build",
-    "--target",
-    "x86_64-apple-darwin",
-    "--release"
-]
-
+args = ["build", "--target", "x86_64-apple-darwin", "--release"]

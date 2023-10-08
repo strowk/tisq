@@ -1,0 +1,6 @@
+/target
+/storage
+debug.log
+prepare.sh
+docker-cache
+cross

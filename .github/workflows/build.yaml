@@ -1,0 +1,69 @@
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          key: all-caches
+          path: |
+            ./target
+            ~/.cargo
+            ./cross
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v2
+      - run: cargo install cargo-make
+      # Create target folder beforehand, as otherwise it would be
+      # created from container and would not have right user
+      - run: mkdir -p ./target
+      # - run: cargo make test-coverage
+      - run: cargo make install-cross
+      - run: cargo make build-linux_x86_64
+      - run: cargo make build-windows_x86_64
+      - run: cargo make build-mac_x86_64
+        env:
+          CACHE_TO: type=gha,mode=max,scope=mac_x86_64
+          CACHE_FROM: type=gha,scope=mac_x86_64
+      - run: cargo make build-mac_arm
+        env:
+          CACHE_TO: type=gha,mode=max,scope=mac_arm
+          CACHE_FROM: type=gha,scope=mac_arm
+      - name: Read changelog
+        id: changelog-reader
+        if: >
+          github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          version: ${{ (github.ref_type == 'tag' && !contains(github.ref_name, '-') && github.ref_name) || 'Unreleased' }}
+          path: ./CHANGELOG.md
+      - name: Log into crates.io
+        if: github.event_name != 'pull_request'
+        run: cargo login -- ${{ secrets.CRATES_IO_TOKEN }}
+        shell: bash
+      - name: Publish crate
+        if: >
+          github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        run: cargo publish ${{ !startsWith(github.ref, 'refs/tags/v') && '--dry-run' || '' }}
+        shell: bash
+      - run: tar -czf tisq-aarch64-apple-darwin.tar.gz target/aarch64-apple-darwin/release/tisq
+      - run: tar -czf tisq-x86_64-apple-darwin.tar.gz target/x86_64-apple-darwin/release/tisq
+      - run: tar -czf tisq-x86_64-unknown-linux-gnu.tar.gz target/x86_64-unknown-linux-gnu/release/tisq
+      - run: tar -czf tisq-x86_64-pc-windows-gnu.tar.gz target/x86_64-pc-windows-gnu/release/tisq.exe
+      - name: Create GitHub release
+        if: >
+          github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.changelog-reader.outputs.changes }}
+          prerelease: ${{ startsWith(github.ref, 'refs/tags/v') && contains(github.ref_name, '-') }}
+          draft: ${{ !startsWith(github.ref, 'refs/tags/v') && steps.changelog-reader.outputs.status == 'unreleased' }}
+          files: |
+            tisq-*.tar.gz

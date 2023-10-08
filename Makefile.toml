@@ -1,0 +1,170 @@
+[env]
+CACHE_TO = { value = "type=local,dest=../../docker-cache", condition = { env_not_set = ["CACHE_TO"] } }
+CACHE_FROM = { value = "type=local,src=../../docker-cache", condition = { env_not_set = ["CACHE_FROM"] } }
+
+[tasks.install]
+command = "cargo"
+args = [
+    "install",
+    "--path",
+    "./"
+]
+
+[tasks.test-coverage]
+command = "docker"
+args = [
+    "run",
+    "--security-opt",
+    "seccomp=unconfined",
+    "--rm",
+    "-v", 
+    "${CARGO_MAKE_WORKING_DIRECTORY}:/volume",
+    "xd009642/tarpaulin", 
+    "bash", 
+    "-c",
+    """git config --global user.name 'Test Fella' \
+    && git config --global user.email 'justfortest@domain.example' \
+    && git config --global --add safe.directory /volume \
+    && cargo tarpaulin"""
+]
+
+# Cross builds for linux, windows and mac
+
+[tasks.install-cross]
+command = "cargo"
+args = [
+    "install",
+    "cross",
+    "--git",
+    "https://github.com/cross-rs/cross"
+]
+
+[tasks.build-all]
+dependencies = [
+    "build-linux_x86_64",
+    "build-windows_x86_64",
+    "build-mac_x86_64",
+    "build-mac_arm"
+]
+
+# Building binary for linux x86_64
+[tasks.build-linux_x86_64]
+command = "cross"
+args = [
+    "build",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "--release"
+]
+
+# Building binary for windows x86_64
+
+[tasks.build-windows_x86_64]
+command = "cross"
+args = [
+    "build",
+    "--target",
+    "x86_64-pc-windows-gnu",
+    "--release"
+]
+
+# Building binaries for MacOS
+
+[tasks.clone-cross]
+condition = { files_not_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/cross"] }
+command = "git"
+args = [
+    "clone",
+    "https://github.com/cross-rs/cross.git"
+]
+
+[tasks.get-cross-toolchains]
+dependencies = [ "clone-cross" ]
+command = "git"
+condition = { files_not_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/docker/cross-toolchains/README.md"] }
+cwd = "./cross"
+args = [
+    "submodule",
+    "update",
+    "--init",
+    "--remote"
+]
+
+[tasks.create-docker-engine]
+ignore_errors = true
+command = "docker"
+args = [
+    "buildx",
+    "create",
+    "--use",
+    "--name",
+    "docker-container",
+    "--driver=docker-container"
+]
+
+[tasks.cross-image-mac_arm]
+dependencies = [ "get-cross-toolchains", "create-docker-engine" ]
+command = "cargo"
+cwd = "./cross"
+args = [
+    "build-docker-image",
+    "aarch64-apple-darwin-cross",
+    "--tag",
+    "local",
+    "--build-arg",
+    "MACOS_SDK_URL=https://storage.googleapis.com/ory.sh/build-assets/MacOSX11.3.sdk.tar.xz",
+    "--cache-to",
+    "${CACHE_TO}",
+    "--cache-from",
+    "${CACHE_FROM}",
+    # Overriding git reference supplied by Github
+    # to avoid unnecessary struggle with name of docker image
+    "--ref-type",
+    "branch",
+    "--ref-name",
+    "main"
+]
+
+[tasks.build-mac_arm]
+dependencies = [ "cross-image-mac_arm" ]
+command = "cross"
+args = [
+    "build",
+    "--target",
+    "aarch64-apple-darwin",
+    "--release"
+]
+
+[tasks.cross-image-mac_x86_64]
+dependencies = [ "get-cross-toolchains", "create-docker-engine" ]
+command = "cargo"
+cwd = "./cross"
+args = [
+    "build-docker-image",
+    "x86_64-apple-darwin-cross",
+    "--tag",
+    "local",
+    "--build-arg",
+    "MACOS_SDK_URL=https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz",
+    "--cache-to",
+    "${CACHE_TO}",
+    "--cache-from",
+    "${CACHE_FROM}",
+    # Overriding git reference supplied by Github
+    # to avoid unnecessary struggle with name of docker image
+    "--ref-type",
+    "branch",
+    "--ref-name",
+    "main"
+]
+
+[tasks.build-mac_x86_64]
+dependencies = [ "cross-image-mac_x86_64" ]
+command = "cross"
+args = [
+    "build",
+    "--target",
+    "x86_64-apple-darwin",
+    "--release"
+]
+

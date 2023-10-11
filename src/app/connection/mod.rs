@@ -11,11 +11,22 @@ use sqlx::{
 };
 use uuid::Uuid;
 
+
+mod executing;
+mod posgres;
+mod types;
+
+use executing::Executing;
+
 pub(crate) struct Connection {
     pub(crate) name: String,
     pub(crate) url: String,
 
     pub(crate) internal: TypedConnection,
+}
+
+pub(crate) enum TypedConnection {
+    Postgres(PgConnection),
 }
 
 const DEFAULT_MANAGEMENT_DATABASE: &str = "postgres";
@@ -51,10 +62,6 @@ impl Connection {
             }
         }
     }
-}
-
-pub(crate) enum TypedConnection {
-    Postgres(PgConnection),
 }
 
 #[derive(Hash, PartialEq, Eq)]
@@ -190,90 +197,6 @@ impl ConnectionsManager {
             TypedConnection::Postgres(connection) => connection,
         };
 
-        // let prepared_query = connection.prepare(&query).await?;
-        let mut headers: Vec<String> = vec![];
-        let mut rows = sqlx::query(&query)
-            .persistent(false)
-            .map(|row: PgRow| {
-                let mut data: Vec<String> = vec![];
-                if headers.is_empty() {
-                    headers = row
-                        .columns()
-                        .iter()
-                        .map(|col| col.name().to_string())
-                        .collect();
-                }
-                // select * from test;
-                // select * from test2;
-                for (i, col) in row.columns().iter().enumerate() {
-                    let type_info = col.type_info();
-                    match *type_info.kind() {
-                        PgTypeKind::Simple => {
-                            // let raw = row.try_get_raw(i).unwrap();
-                            // println!("{}: {:?}", col.name(), raw.as_str().unwrap());
-                            let oid = type_info.oid().unwrap().0;
-
-                            if oid >= 20 && oid <= 23 {
-                                let val: i32 = row.get::<i32, usize>(i);
-                                // println!("{}: {:?}", col.name(), val);
-                                data.push(format!("{}", val));
-                            } else if (oid == 1043) || (oid == 25) {
-                                let val: String = row.get::<String, usize>(i);
-                                // println!("{}: {:?}", col.name(), val);
-                                data.push(val);
-                            } else {
-                                tracing::warn!("Unknown oid: {}, try bind to string", oid);
-                                let val: String = row.get::<String, usize>(i);
-                                data.push(val);
-                            }
-
-                            // match  type_info {
-                            //     PgTypeInfo::BOOL => {}
-                            // }
-                        }
-                        PgTypeKind::Pseudo => todo!(),
-                        PgTypeKind::Domain(_) => todo!(),
-                        PgTypeKind::Composite(_) => todo!(),
-                        PgTypeKind::Array(_) => todo!(),
-                        PgTypeKind::Enum(_) => todo!(),
-                        PgTypeKind::Range(_) => todo!(),
-                    };
-                    // if PgType::from_oid(col.type_info().oid().unwrap().0).unwrap() == PgType::INT4 {
-                    //     let val: i32 = row.get::<i32, usize>(i);
-                    //     println!("val: {:?}", val);
-                    // }
-                }
-
-                // println!("row 0: {:?}", data.as_str().unwrap());
-                // data.as_str().unwrap();
-                data
-                //     data.as_str().unwrap()
-            })
-            .fetch(connection);
-
-        // let rows = sqlx::query(&query).fetch(&mut conn);
-
-        let mut data: Vec<Vec<String>> = vec![];
-
-        while let Some(row) = rows.try_next().await? {
-            data.push(row);
-            // map the row into a user-defined domain type
-            // let email: &str = row.try_get("email")?;
-            // let data = row.try_get_raw(0).unwrap();
-            // println!("test: {:?}", row);
-        }
-        drop(rows);
-
-        // if data.is_empty() {
-        //     headers = prepared_query
-        //         .columns()
-        //         .iter()
-        //         .map(|col| col.name().to_string())
-        //         .collect();
-        // }
-
-        // println!("row: {:?}", row);
-
-        Ok((headers, data))
+        connection.execute_sqlx(query).await
     }
 }

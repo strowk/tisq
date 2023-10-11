@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Supported more postgres types, such as bool, char, smallint, bigint, float4, float8, bytea and similar to them.
+
 ## [v0.1.3] - 2023-10-08
 
 ### Added

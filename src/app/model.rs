@@ -19,7 +19,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use std::{thread, vec};
 use tui_realm_treeview::{Node, Tree};
-use tuirealm::event::{Key, KeyEvent, KeyEventKind, KeyModifiers};
+
 use tuirealm::props::{PropPayload, PropValue, TextSpan};
 use tuirealm::terminal::TerminalBridge;
 use tuirealm::tui::layout::{Constraint, Direction, Layout};

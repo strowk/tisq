@@ -1,20 +1,18 @@
-use std::time::Duration;
 
-use tui_realm_stdlib::{Paragraph, Table};
+
+use tui_realm_stdlib::{Paragraph};
 use tuirealm::command::{Cmd, CmdResult, Direction, Position};
 use tuirealm::props::{
-    Alignment, BorderSides, BorderType, Borders, Color, PropPayload, PropValue, TableBuilder,
+    Alignment, BorderSides, Borders, PropPayload, PropValue,
     TextSpan,
 };
-use tuirealm::terminal::TerminalBridge;
+
 use tuirealm::{
-    application::PollStrategy,
-    event::{Key, KeyEvent},
-    Application, Component, Event, EventListenerCfg, MockComponent, NoUserEvent, Update,
+    event::{Key, KeyEvent}, Component, Event, MockComponent,
 };
 use tuirealm::{AttrValue, Attribute};
 // tui
-use tuirealm::tui::layout::{Constraint, Direction as LayoutDirection, Layout};
+
 
 use crate::app::{DbResponse, TisqEvent};
 use crate::Msg;

@@ -8,8 +8,7 @@ use tuirealm::{
 use uuid::Uuid;
 
 use crate::{
-    app::{DbResponse, TisqEvent},
-    Id, Msg,
+    app::{DbResponse, TisqEvent}, Msg,
 };
 
 pub enum BrowserTreeId {
@@ -99,7 +98,7 @@ impl PartialOrd for SentTree {
 
 impl Component<Msg, TisqEvent> for BrowserTree {
     fn on(&mut self, ev: Event<TisqEvent>) -> Option<Msg> {
-        let result = match ev {
+        let _result = match ev {
             Event::User(TisqEvent::TreeReloaded(SentTree(tree))) => {
                 self.set_tree(tree);
                 return Some(Msg::None);

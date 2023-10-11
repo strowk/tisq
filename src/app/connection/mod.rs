@@ -4,9 +4,9 @@ use std::{
 };
 
 use async_std::task;
-use futures::TryStreamExt;
+
 use sqlx::{
-    postgres::{PgConnectOptions, PgRow, PgTypeKind},
+    postgres::{PgConnectOptions},
     Column, Connection as SqlxConnection, Executor, PgConnection, Row,
 };
 use uuid::Uuid;

@@ -3,23 +3,19 @@ use std::ops::BitOr;
 #[cfg(feature = "search")]
 use tuirealm::StateValue;
 use tuirealm::{
-    application::PollStrategy,
     command::{Cmd, CmdResult, Direction, Position},
     event::{Event, Key, KeyEvent, KeyEventKind, KeyModifiers},
     props::{
         Alignment, AttrValue, Attribute, BorderSides, BorderType, Borders, Color, Style,
         TextModifiers,
-    },
-    terminal::TerminalBridge,
-    Application, Component, EventListenerCfg, MockComponent, NoUserEvent, State, StateValue,
-    Update,
+    }, Component, MockComponent, State, StateValue,
 };
 // tui
-use tuirealm::tui::layout::{Constraint, Direction as LayoutDirection, Layout};
+
 // label
 #[cfg(feature = "search")]
 use tui_realm_stdlib::Input;
-use tui_realm_stdlib::Label;
+
 // textarea
 #[cfg(feature = "clipboard")]
 use tui_realm_textarea::TEXTAREA_CMD_PASTE;
@@ -121,7 +117,7 @@ impl<'a> Editor<'a> {
 impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
     fn on(&mut self, ev: Event<TisqEvent>) -> Option<Msg> {
         let alt_control: KeyModifiers = KeyModifiers::ALT.bitor(KeyModifiers::CONTROL);
-        let cntrl_shift: KeyModifiers = KeyModifiers::SHIFT.bitor(KeyModifiers::CONTROL);
+        let _cntrl_shift: KeyModifiers = KeyModifiers::SHIFT.bitor(KeyModifiers::CONTROL);
         // tracing::debug!("matching {:?}", ev);
         match ev {
             // Event::Keyboard(KeyEvent {

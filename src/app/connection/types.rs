@@ -1,9 +1,8 @@
 use std::fmt::{Debug, Display};
 
 use sqlx::{
-    postgres::{PgRow, PgTypeInfo},
     types::BigDecimal,
-    ColumnIndex, Postgres, Row, Type,
+    ColumnIndex, Row, Type,
 };
 
 pub(super) trait GenericTypeWriter<'a, T, R, D>

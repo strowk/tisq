@@ -1,8 +1,8 @@
 use super::Msg;
 
-use tuirealm::props::{Alignment, Borders, Color, Style};
 
-use tuirealm::tui::widgets::Block;
+
+
 
 // -- modules
 mod add_server_form;
@@ -23,7 +23,7 @@ pub(crate) use browser::SentTree;
 pub use editor::Editor;
 pub(crate) use execute_result_table::ExecuteResultTable;
 pub(crate) use error_result::ErrorResult;
-pub(crate) use execute_result_table::QueryResult;
+
 pub use global_keys::GlobalListener;
 pub use label::Label;
 pub(crate) use tabs::EditorTabs;

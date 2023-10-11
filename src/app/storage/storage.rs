@@ -24,7 +24,7 @@ pub(crate) struct NewServer {
 }
 
 impl Storage {
-    pub fn add_server(&mut self, mut server: NewServer) -> eyre::Result<()> {
+    pub fn add_server(&mut self, server: NewServer) -> eyre::Result<()> {
         let bucket = Self::get_servers_bucket(&self.store)?;
         let id = Uuid::new_v4();
         let server = StoredServer {
@@ -76,7 +76,7 @@ impl Storage {
             fs::create_dir_all(storage_path)?;
         }
 
-        let mut cfg = Config::new("./storage");
+        let cfg = Config::new("./storage");
         let store = Store::new(cfg)?;
 
         // let servers_bucket = Self::get_servers_bucket(&store)?;

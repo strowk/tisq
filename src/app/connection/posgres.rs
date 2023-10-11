@@ -1,10 +1,10 @@
-use std::fmt::Display;
+
 
 use async_trait::async_trait;
 use futures::TryStreamExt;
 use sqlx::{
     postgres::{PgRow, PgTypeKind, PgTypeInfo},
-    Column, ColumnIndex, Database, PgConnection, Postgres, Row, Type, TypeInfo,
+    Column, PgConnection, Postgres, Row, Type, TypeInfo,
 };
 
 use super::{executing::Executing, types::GenericTypeWriter};

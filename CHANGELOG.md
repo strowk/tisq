@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+## [v0.1.5] - 2023-10-11
+
 ### Added
 
 - Shortcuts to switch between editor and query result.
@@ -60,7 +62,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Execution results view supporting only successful fetched results.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.5...HEAD
+[v0.1.5]: https://github.com/strowk/tisq/compare/v0.1.4...v0.1.5
 [v0.1.4]: https://github.com/strowk/tisq/compare/v0.1.3...v0.1.4
 [v0.1.3]: https://github.com/strowk/tisq/compare/v0.1.2...v0.1.3
 [v0.1.2]: https://github.com/strowk/tisq/compare/v0.1.1...v0.1.2

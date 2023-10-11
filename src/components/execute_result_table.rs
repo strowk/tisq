@@ -2,15 +2,14 @@ use std::time::Duration;
 
 use tui_realm_stdlib::Table;
 use tuirealm::command::{Cmd, CmdResult, Direction, Position};
+use tuirealm::event::{KeyEventKind, KeyModifiers};
 use tuirealm::props::{
     Alignment, BorderSides, BorderType, Borders, Color, PropPayload, PropValue, TableBuilder,
     TextSpan,
 };
-use tuirealm::terminal::TerminalBridge;
 use tuirealm::{
-    application::PollStrategy,
     event::{Key, KeyEvent},
-    Application, Component, Event, EventListenerCfg, MockComponent, NoUserEvent, Update,
+    Component, Event, MockComponent,
 };
 use tuirealm::{AttrValue, Attribute};
 // tui
@@ -28,11 +27,15 @@ pub(crate) struct QueryResult {
 #[derive(MockComponent)]
 pub(crate) struct ExecuteResultTable {
     component: Table,
+    result: Option<QueryResult>,
+    column_offset: usize,
 }
 
 impl Default for ExecuteResultTable {
     fn default() -> Self {
         Self {
+            column_offset: 0,
+            result: None,
             component: Table::default()
                 .borders(
                     Borders::default()
@@ -55,44 +58,51 @@ impl Default for ExecuteResultTable {
 }
 
 impl ExecuteResultTable {
-    fn set_result(&mut self, result: QueryResult) {
+    fn update_result(&mut self) {
+        if let Some(result) = self.result.as_ref() {
+            let mut builder = TableBuilder::default();
+
+            result.data.iter().for_each(|row| {
+                row.iter().skip(self.column_offset).for_each(|col| {
+                    builder.add_col(TextSpan::from(col));
+                });
+                builder.add_row();
+            });
+
+            self.component.attr(
+                tuirealm::Attribute::Content,
+                AttrValue::Table(builder.build()),
+            );
+
+            let widths = self.widths(&result).clone();
+
+            self.attr(
+                Attribute::Text,
+                AttrValue::Payload(PropPayload::Vec(
+                    result
+                        .headers
+                        .iter()
+                        .skip(self.column_offset)
+                        .map(|x| PropValue::Str(x.to_string()))
+                        .collect(),
+                )),
+            );
+
+            self.attr(
+                Attribute::Width,
+                AttrValue::Payload(PropPayload::Vec(
+                    widths.iter().map(|x| PropValue::U16(*x)).collect(),
+                )),
+            );
+        }
+    }
+
+    fn set_result(&mut self, result: QueryResult, column_offet: usize) {
         // println!("Setting result: {:?}", result);
         // self.component.table(TableBuilder::default().build());
-
-        let mut builder = TableBuilder::default();
-
-        result.data.iter().for_each(|row| {
-            row.iter().for_each(|col| {
-                builder.add_col(TextSpan::from(col));
-            });
-            builder.add_row();
-        });
-
-        self.component.attr(
-            tuirealm::Attribute::Content,
-            AttrValue::Table(builder.build()),
-        );
-
-        self.attr(
-            Attribute::Width,
-            AttrValue::Payload(PropPayload::Vec(
-                self.widths(&result)
-                    .iter()
-                    .map(|x| PropValue::U16(*x))
-                    .collect(),
-            )),
-        );
-
-        self.attr(
-            Attribute::Text,
-            AttrValue::Payload(PropPayload::Vec(
-                result
-                    .headers
-                    .iter()
-                    .map(|x| PropValue::Str(x.to_string()))
-                    .collect(),
-            )),
-        );
+        self.column_offset = column_offet;
+        self.result = Some(result);
+        self.update_result();
     }
 
     fn widths(&self, result: &QueryResult) -> Vec<u16> {
@@ -108,12 +118,14 @@ impl ExecuteResultTable {
         }
         result.data.iter().for_each(|row| {
             row.iter()
+                .skip(self.column_offset)
                 .enumerate()
                 .for_each(|(i, col)| update_widths(&mut absolute_widths, col, i));
         });
         result
             .headers
             .iter()
+            .skip(self.column_offset)
             .enumerate()
             .for_each(|(i, col)| update_widths(&mut absolute_widths, col, i));
         // tracing::debug!("widths: {:?}", widths);
@@ -126,7 +138,7 @@ impl ExecuteResultTable {
             .collect::<Vec<u16>>()
 
         // TODO: change underlying table to use absolute widths instead of percentages
-        
+
         // absolute_widths
 
         // if result.data.is_empty() {
@@ -139,42 +151,82 @@ impl ExecuteResultTable {
     }
 }
 
+// TODO: could be cool to support scroll "mouse" events, such as:
+// https://docs.rs/crossterm/latest/crossterm/event/enum.MouseEventKind.html
+
 impl Component<Msg, TisqEvent> for ExecuteResultTable {
     fn on(&mut self, ev: Event<TisqEvent>) -> Option<Msg> {
         // println!("ExecuteResultTable event: {:?}", ev);
         let _ = match ev {
             Event::User(TisqEvent::DbResponse(DbResponse::Executed(_, headers, data))) => {
-                self.set_result(QueryResult { headers, data });
+                self.set_result(QueryResult { headers, data }, 0);
                 return Some(Msg::ShowFetchedTable);
             }
-
-            Event::User(TisqEvent::DbResponse(DbResponse::Error(_, data))) => {
-                // TODO: display error
-                return Some(Msg::None);
-            }
+            // Event::User(TisqEvent::DbResponse(DbResponse::Error(_, data))) => {
+            //     return Some(Msg::None);
+            // }
             // Event::User(TisqEvent::QueryResultFetched(result)) => {
             //     self.set_result(result);
             //     return Some(Msg::None);
             // }
             Event::Keyboard(KeyEvent {
-                code: Key::Down, ..
-            }) => self.perform(Cmd::Move(Direction::Down)),
-            Event::Keyboard(KeyEvent { code: Key::Up, .. }) => {
-                self.perform(Cmd::Move(Direction::Up))
+                code: code @ (Key::Left | Key::Right),
+                kind: KeyEventKind::Press,
+                modifiers: KeyModifiers::CONTROL,
+                ..
+            }) => {
+                if let Some(result) = self.result.as_ref() {
+                    self.column_offset = match code {
+                        Key::Left => {
+                            if self.column_offset > 0 {
+                                self.column_offset - 1
+                            } else {
+                                0
+                            }
+                        }
+                        Key::Right => {
+                            if self.column_offset < result.headers.len() - 1 {
+                                self.column_offset + 1
+                            } else {
+                                self.column_offset
+                            }
+                        }
+                        _ => 0,
+                    };
+                    self.update_result();
+                }
+                CmdResult::None
             }
             Event::Keyboard(KeyEvent {
+                code: Key::Down,
+                kind: KeyEventKind::Press,
+                ..
+            }) => self.perform(Cmd::Move(Direction::Down)),
+            Event::Keyboard(KeyEvent {
+                code: Key::Up,
+                kind: KeyEventKind::Press,
+                ..
+            }) => self.perform(Cmd::Move(Direction::Up)),
+            Event::Keyboard(KeyEvent {
                 code: Key::PageDown,
+                kind: KeyEventKind::Press,
                 ..
             }) => self.perform(Cmd::Scroll(Direction::Down)),
             Event::Keyboard(KeyEvent {
-                code: Key::PageUp, ..
+                code: Key::PageUp,
+                kind: KeyEventKind::Press,
+                ..
             }) => self.perform(Cmd::Scroll(Direction::Up)),
             Event::Keyboard(KeyEvent {
-                code: Key::Home, ..
+                code: Key::Home,
+                kind: KeyEventKind::Press,
+                ..
             }) => self.perform(Cmd::GoTo(Position::Begin)),
-            Event::Keyboard(KeyEvent { code: Key::End, .. }) => {
-                self.perform(Cmd::GoTo(Position::End))
-            }
+            Event::Keyboard(KeyEvent {
+                code: Key::End,
+                kind: KeyEventKind::Press,
+                ..
+            }) => self.perform(Cmd::GoTo(Position::End)),
             _ => CmdResult::None,
         };
         Some(Msg::None)

@@ -38,7 +38,7 @@ Only Postgres is supported at the moment and with very limited set of types.
 ### Global
 
 - Escape - quit
-- Alt+Left, Alt+Right / Ctrl+Alt+Left, Ctrl+Alt+Right - navigation
+- Alt+Left, Alt+Right, Alt+Up, Alt+Down / Ctrl+Alt+Left, Ctrl+Alt+Right, Ctrl+Alt+Up, Ctrl+Alt+Down - navigation
 
 ### Tree view
 
@@ -53,3 +53,9 @@ Only Postgres is supported at the moment and with very limited set of types.
 - Ctrl+Alt+Enter / Ctrl+E / Ctrl+R - execute query
 - Ctrl+PageUp, Ctrl+PageDown - switch between tabs
 
+
+### Query result
+
+- Up, Down - move selected line pointer
+- PageUp, PageDown - move by page
+- Ctrl+Left, Ctrl+Right - scroll columns

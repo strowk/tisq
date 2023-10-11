@@ -18,6 +18,8 @@ impl GlobalListener {
         match key {
             Key::Left => Some(Msg::NavigateLeft),
             Key::Right => Some(Msg::NavigateRight),
+            Key::Up => Some(Msg::NavigateUp),
+            Key::Down => Some(Msg::NavigateDown),
             _ => None,
         }
     }
@@ -64,6 +66,38 @@ impl GlobalListener {
                 }),
                 SubClause::Always,
             ),
+            Sub::new(
+                SubEventClause::Keyboard(KeyEvent {
+                    code: Key::Up,
+                    modifiers: KeyModifiers::ALT,
+                    kind: KeyEventKind::Press,
+                }),
+                SubClause::Always,
+            ),
+            Sub::new(
+                SubEventClause::Keyboard(KeyEvent {
+                    code: Key::Down,
+                    modifiers: KeyModifiers::ALT,
+                    kind: KeyEventKind::Press,
+                }),
+                SubClause::Always,
+            ),
+            Sub::new(
+                SubEventClause::Keyboard(KeyEvent {
+                    code: Key::Up,
+                    modifiers: KeyModifiers::ALT.bitor(KeyModifiers::CONTROL),
+                    kind: KeyEventKind::Press,
+                }),
+                SubClause::Always,
+            ),
+            Sub::new(
+                SubEventClause::Keyboard(KeyEvent {
+                    code: Key::Down,
+                    modifiers: KeyModifiers::ALT.bitor(KeyModifiers::CONTROL),
+                    kind: KeyEventKind::Press,
+                }),
+                SubClause::Always,
+            ),
         ]
     }
 }
@@ -81,19 +115,13 @@ impl Component<Msg, TisqEvent> for GlobalListener {
 
             Event::Keyboard(
                 key @ KeyEvent {
-                    code: Key::Left | Key::Right,
-                    kind: KeyEventKind::Press,
-                    modifiers: KeyModifiers::ALT,
-                },
-            ) => Self::switch_location(key.code),
-
-            Event::Keyboard(
-                key @ KeyEvent {
-                    code: Key::Left | Key::Right,
+                    code: Key::Left | Key::Right | Key::Up | Key::Down,
                     kind: KeyEventKind::Press,
                     modifiers,
                 },
-            ) if modifiers == alt_control => Self::switch_location(key.code),
+            ) if modifiers == alt_control || modifiers == KeyModifiers::ALT => {
+                Self::switch_location(key.code)
+            }
 
             _ => None,
         }

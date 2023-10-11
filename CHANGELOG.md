@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Shortcuts to switch between editor and query result.
+- Query result table can be navigated with arrow keys - up/down move selected line and scroll if needed.
+- Query result columns can be scrolled by Ctrl+Left, Ctrl+Right.
+- Query result rows can be scrolled with PageUp, PageDown page-by-page.
+
+### Fixed
+
+- Fixed failing on nulls in query result.
+
 ## [v0.1.4] - 2023-10-11
 
 ### Added

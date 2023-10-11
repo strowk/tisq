@@ -30,6 +30,8 @@ pub(crate) enum Msg {
 
     NavigateRight,
     NavigateLeft,
+    NavigateUp,
+    NavigateDown,
 
     PreviousEditor,
     NextEditor,

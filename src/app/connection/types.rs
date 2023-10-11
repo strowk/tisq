@@ -79,8 +79,6 @@ where
 
         // uuid::Uuid	UUID
 
-
-
         // Requires the ipnetwork Cargo feature flag.
 
         //         ipnetwork::IpNetwork	INET, CIDR
@@ -110,8 +108,11 @@ where
         K: Display,
     {
         if <K as Type<D>>::compatible(type_info) {
-            let val: K = row.get::<K, usize>(i);
-            data.push(format!("{}", val));
+            let val: Option<K> = row.get::<Option<K>, usize>(i);
+            let val = val
+                .map(|val| val.to_string())
+                .unwrap_or_else(|| "null".to_string());
+            data.push(val);
             return true;
         }
         false

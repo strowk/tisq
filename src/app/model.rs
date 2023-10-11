@@ -592,6 +592,11 @@ impl Update<Msg> for Model {
                     Some(&Id::Editor(_)) => Some(Msg::ChangeFocus(Id::Tree)),
                     _ => None,
                 },
+                Msg::NavigateUp | Msg::NavigateDown => match self.app.focus() {
+                    Some(&Id::Editor(_)) => Some(Msg::ChangeFocus(Id::QueryResultTable)),
+                    Some(&Id::QueryResultTable) => Some(Msg::ChangeFocus(Id::EditorPanel)),
+                    _ => None,
+                },
                 Msg::ShowErrorResult => {
                     self.execute_result_state = ExecuteResultState::Error;
                     None

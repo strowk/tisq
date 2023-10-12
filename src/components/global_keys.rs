@@ -98,9 +98,19 @@ impl GlobalListener {
                 }),
                 SubClause::Always,
             ),
+            Sub::new(
+                SubEventClause::Keyboard(KeyEvent {
+                    code: NEXT_PANEL,
+                    modifiers: KeyModifiers::CONTROL,
+                    kind: KeyEventKind::Press,
+                }),
+                SubClause::Always,
+            ),
         ]
     }
 }
+
+const NEXT_PANEL: Key = Key::Char('n');
 
 impl Component<Msg, TisqEvent> for GlobalListener {
     fn on(&mut self, ev: Event<TisqEvent>) -> Option<Msg> {
@@ -112,6 +122,12 @@ impl Component<Msg, TisqEvent> for GlobalListener {
                 modifiers: KeyModifiers::NONE,
                 kind: KeyEventKind::Press,
             }) => Some(Msg::AppClose),
+
+            Event::Keyboard(KeyEvent {
+                code: NEXT_PANEL,
+                modifiers: KeyModifiers::CONTROL,
+                kind: KeyEventKind::Press,
+            }) => Some(Msg::CycleNavigation),
 
             Event::Keyboard(
                 key @ KeyEvent {

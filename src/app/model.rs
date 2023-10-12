@@ -587,6 +587,12 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
+                Msg::CycleNavigation => match self.app.focus() {
+                    Some(&Id::Tree) => Some(Msg::ChangeFocus(Id::EditorPanel)),
+                    Some(&Id::Editor(_)) => Some(Msg::ChangeFocus(Id::QueryResultTable)), // TODO: if error?
+                    Some(&Id::QueryResultTable) => Some(Msg::ChangeFocus(Id::Tree)),
+                    _ => None,
+                },
                 Msg::NavigateRight | Msg::NavigateLeft => match self.app.focus() {
                     Some(&Id::Tree) => Some(Msg::ChangeFocus(Id::EditorPanel)),
                     Some(&Id::Editor(_)) => Some(Msg::ChangeFocus(Id::Tree)),

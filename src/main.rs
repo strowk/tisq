@@ -38,6 +38,8 @@ pub(crate) enum Msg {
     MoveTabLeft(EditorId),
     MoveTabRight(EditorId),
 
+    CycleNavigation,
+
     StartAddingServer,
     FocusPreviousInput,
     FocusNextInput,

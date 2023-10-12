@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Cycle navigation shortcut Ctrl+n.
+
 ## [v0.1.5] - 2023-10-11
 
 ### Added

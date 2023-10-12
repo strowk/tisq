@@ -10,6 +10,10 @@ Features:
 - View query execution results in table.
 - Switch between multiple query tabs with different connections.
 
+## Status
+
+In active development. Not ready for production use, there are no tests, incomplete error handling, program can crash on some inputs that are not yet completely supported (like f.e array types).
+
 ## Installation
 
 ### With script

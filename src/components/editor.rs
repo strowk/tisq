@@ -8,7 +8,8 @@ use tuirealm::{
     props::{
         Alignment, AttrValue, Attribute, BorderSides, BorderType, Borders, Color, Style,
         TextModifiers,
-    }, Component, MockComponent, State, StateValue,
+    },
+    Component, MockComponent, State, StateValue,
 };
 // tui
 
@@ -368,10 +369,12 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
             }
             Event::Keyboard(KeyEvent {
                 code: Key::Char(ch),
-
                 kind: KeyEventKind::Press,
+                modifiers,
                 ..
-            }) => {
+            }) if !ch.is_alphabetic() || modifiers == KeyModifiers::NONE => {
+                // either a non-alphabetic char or an alphabetic char without modifiers to allow
+                // for global key bindings on alphabetic chars
                 self.perform(Cmd::Type(ch));
                 Some(Msg::None)
             }

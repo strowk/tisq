@@ -13,15 +13,12 @@ args = ["install", "--path", "./"]
 [tasks.vhs]
 cwd = "vhs"
 dependencies = ["build-linux_x86_64"]
-script_runner = "@shell"
+script_runner = "@duckscript"
 script = """
-set -e
 cp ../target/x86_64-unknown-linux-gnu/release/tisq ./tisq
-
-docker build -t vhs-tisq .
-docker run --rm --privileged --network tisq -v ${CARGO_MAKE_WORKING_DIRECTORY}:/vhs vhs-tisq ./base.tape
-rm -Rf ./storage 
-
+exec docker build -t vhs-tisq .
+exec docker run --rm --privileged --network tisq -v ${CARGO_MAKE_WORKING_DIRECTORY}:/vhs vhs-tisq ./base.tape
+rmdir storage
 """
 
 [tasks.test-coverage]

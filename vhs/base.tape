@@ -101,5 +101,34 @@ Ctrl+e
 
 Sleep 4
 
+Ctrl+n
 
+Sleep 1
+
+Down
+Sleep 0.5
+
+Down
+Sleep 0.5
+
+Down
+Sleep 0.5
+
+PageDown
+Sleep 3
+
+Ctrl+n
+Sleep 1
+
+Up
+Sleep 1
+
+Type "q"
+Sleep 1
+
+Type "select datname, oid, encoding, datallowconn from pg_catalog.pg_database;"
+Sleep 2
+
+Ctrl+e
+Sleep 5
 

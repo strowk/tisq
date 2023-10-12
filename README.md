@@ -14,6 +14,10 @@ Features:
 
 In active development. Not ready for production use, there are no tests, incomplete error handling, program can crash on some inputs that are not yet completely supported (like f.e array types).
 
+### Database support
+
+Only Postgres is supported at the moment and with very limited set of types.
+
 ## Installation
 
 ### With script
@@ -32,10 +36,6 @@ Tested on Linux bash and Windows Git Bash.
 git clone https://github.com/strowk/tisq
 cargo install --path ./tisq
 ```
-
-## Database support
-
-Only Postgres is supported at the moment and with very limited set of types.
 
 ## Keybindings
 

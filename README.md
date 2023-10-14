@@ -28,9 +28,12 @@ In bash shell run:
 curl -s https://raw.githubusercontent.com/strowk/tisq/main/install.sh | bash
 ```
 
-Tested on Linux bash and Windows Git Bash.
+Tested on Linux bash and Windows Git Bash. Should work for MacOS too.
 
 ### From sources
+
+If your system/architecture is not supported by the script above, 
+you can install Rust and install TisQ from sources:
 
 ```bash
 git clone https://github.com/strowk/tisq

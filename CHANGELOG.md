@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Cycle navigation shortcut Ctrl+n.
 - Support arrays.
 
+### Fixed
+
+- Process capital letters in query editor.
+
 ## [v0.1.5] - 2023-10-11
 
 ### Added

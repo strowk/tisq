@@ -1,16 +1,16 @@
-
-
 use async_trait::async_trait;
 use futures::TryStreamExt;
 use sqlx::{
-    postgres::{PgRow, PgTypeKind, PgTypeInfo},
+    postgres::{PgRow, PgTypeInfo, PgTypeKind},
     Column, PgConnection, Postgres, Row, Type, TypeInfo,
 };
 
-use super::{executing::Executing, types::GenericTypeWriter};
+use super::{
+    executing::Executing,
+    types::{GenericArrayTypeWriter, GenericTypeWriter},
+};
 
 // TODO: check other drivers, like f.e https://www.sea-ql.org/SeaORM/docs/basic-crud/raw-sql/#use-raw-query--execute-interface
-
 
 // types: https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html
 // types: https://docs.rs/sqlx-mysql/0.7.2/sqlx_mysql/types/index.html
@@ -19,6 +19,10 @@ use super::{executing::Executing, types::GenericTypeWriter};
 struct PgWriter {}
 
 impl GenericTypeWriter<'_, PgTypeInfo, PgRow, Postgres> for PgWriter {}
+
+struct PgArrayWriter {}
+
+impl GenericArrayTypeWriter<'_, PgTypeInfo, PgRow, Postgres> for PgArrayWriter {}
 
 #[async_trait]
 impl Executing for PgConnection {
@@ -41,24 +45,50 @@ impl Executing for PgConnection {
                 }
                 for (i, col) in row.columns().iter().enumerate() {
                     let type_info = col.type_info();
-                    match *type_info.kind() {
+                    // tracing::debug!("checking type: {}", type_info.name());
+
+                    match type_info.kind() {
                         PgTypeKind::Simple => {
+                            // tracing::debug!("Simple type: {}", type_info.name());
                             PgWriter::write_row_cell(type_info, &row, i, &mut data);
                         }
-                        PgTypeKind::Pseudo => todo!(),
-                        PgTypeKind::Domain(_) => todo!(),
-                        PgTypeKind::Composite(_) => todo!(),
-                        PgTypeKind::Array(_) => todo!(),
-                        PgTypeKind::Enum(_) => todo!(),
-                        PgTypeKind::Range(_) => todo!(),
+                        PgTypeKind::Array(internal_type_info) => {
+                            // tracing::debug!("Array type: {}", type_info.name());
+                            PgArrayWriter::write_row_cell(internal_type_info, &row, i, &mut data);
+                        }
+                        PgTypeKind::Pseudo => {
+                            tracing::debug!("Pseudo type not supported: {}", type_info.name());
+                            data.push("not supported".to_string());
+                        }
+                        PgTypeKind::Domain(_) => {
+                            tracing::debug!("Domain type not supported: {}", type_info.name());
+                            data.push("not supported".to_string());
+                        }
+                        PgTypeKind::Composite(_) => {
+                            tracing::debug!("Composite type not supported: {}", type_info.name());
+                            data.push("not supported".to_string());
+                        }
+                        PgTypeKind::Enum(_) => {
+                            tracing::debug!("Enum type not supported: {}", type_info.name());
+                            data.push("not supported".to_string());
+                        }
+                        PgTypeKind::Range(_) => {
+                            tracing::debug!("Range type not supported: {}", type_info.name());
+                            data.push("not supported".to_string());
+                        }
                     };
                 }
 
                 data
             })
             .fetch(self);
+            // .fetch_all(self);
 
         let mut data: Vec<Vec<String>> = vec![];
+
+        // for row in rows.await?.into_iter() {
+        //         data.push(row);
+        // }
 
         while let Some(row) = rows.try_next().await? {
             data.push(row);

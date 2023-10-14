@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Cycle navigation shortcut Ctrl+n.
+- Support arrays.
 
 ## [v0.1.5] - 2023-10-11
 
@@ -52,7 +53,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - `--version` flag to print version.
-- Support arrays.
 
 ## [v0.1.0] - 2023-10-08
 

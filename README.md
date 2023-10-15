@@ -75,6 +75,7 @@ cargo install --path ./tisq
 - [] Add support for MS SQL Server (via https://github.com/prisma/tiberius )
 - [] Add schemas to tree view
 - [] Add other objects to tree view (tables, views, functions, etc)
+- [] Show table columns in tree view
 - [] Save query editors content on exit and restore on start
 - [] Add support for query parameters
 - [] Add support for query history

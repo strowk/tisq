@@ -81,5 +81,8 @@ cargo install --path ./tisq
 - [] Add support for query snippets
 - [] Add support for query templates
 - [] Add support for query execution plan
+- [] Show loading while executing query
+- [] Support queries with big results by paging
+- [] Syntax highlighting for query editor
 - 
 

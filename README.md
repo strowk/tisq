@@ -66,3 +66,20 @@ cargo install --path ./tisq
 - Up, Down - move selected line pointer
 - PageUp, PageDown - move by page
 - Ctrl+Left, Ctrl+Right - scroll columns
+
+## Roadmap
+
+- [] Add support for more Postgres types (from https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html )
+- [] Add support for MySQL
+- [] Add support for SQLite
+- [] Add support for MS SQL Server (via https://github.com/prisma/tiberius )
+- [] Add schemas to tree view
+- [] Add other objects to tree view (tables, views, functions, etc)
+- [] Save query editors content on exit and restore on start
+- [] Add support for query parameters
+- [] Add support for query history
+- [] Add support for query snippets
+- [] Add support for query templates
+- [] Add support for query execution plan
+- 
+

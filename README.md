@@ -84,6 +84,8 @@ cargo install --path ./tisq
 - [] Add support for query execution plan
 - [] Show loading while executing query
 - [] Support queries with big results by paging
+- [] Limit query result size by amount of rows
+- [] Better limit of query result by memory size (use https://docs.rs/datasize/latest/datasize/ )
 - [] Syntax highlighting for query editor
 - [] Error handling: remove all unwrap() calls and anything else that can panic
 - 

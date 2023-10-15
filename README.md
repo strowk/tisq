@@ -12,7 +12,7 @@ Features:
 
 ## Status
 
-In active development. Not ready for production use, there are no tests, incomplete error handling, program can crash on some inputs that are not yet completely supported (like f.e array types).
+In active development. Not ready for production use, there are no tests, incomplete error handling, program can crash on some inputs.
 
 ### Database support
 
@@ -84,5 +84,6 @@ cargo install --path ./tisq
 - [] Show loading while executing query
 - [] Support queries with big results by paging
 - [] Syntax highlighting for query editor
+- [] Error handling: remove all unwrap() calls and anything else that can panic
 - 
 

@@ -2,6 +2,7 @@ extern crate tuirealm;
 
 use std::env;
 use std::fs::File;
+use std::path::PathBuf;
 use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Mutex;
@@ -17,6 +18,7 @@ use tuirealm::{AttrValue, Attribute, Update};
 // -- internal
 mod app;
 mod components;
+mod files;
 use app::model::Model;
 use uuid::Uuid;
 
@@ -91,6 +93,8 @@ static DEBUG_LOG: AtomicBool = AtomicBool::new(false);
 fn main() -> eyre::Result<()> {
     let args: Vec<_> = env::args().collect();
 
+    static FILES_ROOT: Lazy<eyre::Result<PathBuf>> = Lazy::new(|| files::open_tisq_root());
+
     if args.len() > 1 {
         if args[1] == "--version" {
             println!("tisq v{}", VERSION);
@@ -104,9 +108,9 @@ fn main() -> eyre::Result<()> {
 
     static LOG_FILE: Lazy<Option<File>> = Lazy::new(|| {
         File::create(if DEBUG_LOG.load(std::sync::atomic::Ordering::Relaxed) {
-            "tisq-debug.log"
+            FILES_ROOT.as_ref().unwrap().join("tisq-debug.log")
         } else {
-            "tisq-errors.log"
+            FILES_ROOT.as_ref().unwrap().join("tisq-errors.log")
         })
         .map_err(|_| {
             QUIT_CHANNEL
@@ -134,7 +138,10 @@ fn main() -> eyre::Result<()> {
     .init();
 
     // Setup model
-    let mut model = Model::default();
+    let mut model = Model::new(match FILES_ROOT.as_ref() {
+        Ok(root) => root,
+        Err(err) => return Err(eyre::eyre!("Failed to open tisq root directory: {}", err)),
+    });
 
     // Enter alternate screen
     let _ = model.terminal.enter_alternate_screen();

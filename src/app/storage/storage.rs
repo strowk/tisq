@@ -1,4 +1,8 @@
-use std::{collections::HashMap, fs, path::Path};
+use std::{
+    collections::HashMap,
+    env, fs,
+    path::{Path, PathBuf},
+};
 
 use super::id::Id;
 use kv::*;
@@ -70,13 +74,15 @@ impl Storage {
         Ok(bucket)
     }
 
-    pub fn open(storage_path: &Path) -> eyre::Result<Storage> {
-        // let storage_path = std::path::Path::new("./storage");
+    pub fn open(files_root: &PathBuf) -> eyre::Result<Storage> {
+        let storage_path = files_root.join("storage");
+
+        // // create folder if it doesn't exist
         if !storage_path.exists() {
-            fs::create_dir_all(storage_path)?;
+            fs::create_dir_all(&storage_path)?;
         }
 
-        let cfg = Config::new("./storage");
+        let cfg = Config::new(storage_path);
         let store = Store::new(cfg)?;
 
         // let servers_bucket = Self::get_servers_bucket(&store)?;

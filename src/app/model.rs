@@ -13,7 +13,7 @@ use super::storage::{NewServer, Storage};
 use super::{storage, Id, Msg, TisqEvent};
 use ordered_hash_map::OrderedHashMap;
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -73,9 +73,9 @@ struct EditorMetadata {
     name: String,
 }
 
-impl Default for Model {
-    fn default() -> Self {
-        let storage = storage::Storage::open(std::path::Path::new("./storage")).unwrap();
+impl Model {
+    pub(crate) fn new(files_root: &PathBuf) -> Self {
+        let storage = storage::Storage::open(files_root).unwrap();
 
         let event_dispatcher = EventDispatcherPort::new();
 
@@ -125,9 +125,7 @@ impl Default for Model {
             execute_result_state: ExecuteResultState::FetchedTable,
         }
     }
-}
 
-impl Model {
     pub fn view(&mut self) {
         let active_editor_id = self.get_or_set_shown_editor_id();
 

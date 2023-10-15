@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Use home directory `~/.tisq` for storage instead of current.
+
 ### Fixed
 
 - Fixed navigating 'left' from query results.

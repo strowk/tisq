@@ -111,18 +111,18 @@ Config section: `result`.
 
 - [x] Customizable keybindings by config TOML file
 - [ ] Save query editors content on exit and restore on start
+- [ ] Add other objects to tree view (tables, views, functions, etc)
+- [ ] Add schemas to tree view
+- [ ] Show table columns in tree view
+- [ ] Add support for query snippets
+- [ ] status line: Show loading while executing query
 - [ ] Add support for more Postgres types (from https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html )
 - [ ] Error handling: remove all unwrap() calls and anything else that can panic
-- [ ] Add schemas to tree view
-- [ ] Add other objects to tree view (tables, views, functions, etc)
-- [ ] Show table columns in tree view
-- [ ] Customizable keybindings with UI
+- [ ] Customize keybindings in UI
 - [ ] themes: Customizeable style by config TOML file
-- [ ] Add support for query snippets
 - [ ] Add support for query parameters
 - [ ] Add support for query history
 - [ ] Add support for query execution plan
-- [ ] status line: Show loading while executing query
 - [ ] Support queries with big results by paging
 - [ ] Limit query result size by amount of rows
 - [ ] Better limit of query result by memory size (use https://docs.rs/datasize/latest/datasize/ )

@@ -42,6 +42,7 @@ pub(crate) enum Msg {
     NextEditor,
     MoveTabLeft(EditorId),
     MoveTabRight(EditorId),
+    CloseTab(EditorId),
 
     CycleNavigation,
 

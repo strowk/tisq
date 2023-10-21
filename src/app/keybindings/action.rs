@@ -34,6 +34,7 @@ pub(crate) enum TisqKeyboundAction {
     EditorDeleteNextWord,
     EditorMoveToTop,
     EditorMoveToBottom,
+    EditorCloseTab,
 
     BrowserAddServer,
     BrowserDatabaseOpenQueryEditor,
@@ -74,6 +75,7 @@ impl KeyboundAction for TisqKeyboundAction {
                 &TisqKeyboundAction::EditorDeleteNextWord,
                 &TisqKeyboundAction::EditorMoveToTop,
                 &TisqKeyboundAction::EditorMoveToBottom,
+                &TisqKeyboundAction::EditorCloseTab,
             ],
             BROWSER_SECTION => vec![
                 &TisqKeyboundAction::BrowserAddServer,
@@ -237,6 +239,13 @@ impl KeyboundAction for TisqKeyboundAction {
             &TisqKeyboundAction::EditorMoveToBottom => {
                 vec![KeybindingKeyPress {
                     key: Key::End,
+                    modifiers: KeyModifiers::CONTROL,
+                }]
+            }
+
+            &TisqKeyboundAction::EditorCloseTab => {
+                vec![KeybindingKeyPress {
+                    key: Key::Char('w'),
                     modifiers: KeyModifiers::CONTROL,
                 }]
             }

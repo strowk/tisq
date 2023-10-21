@@ -95,6 +95,7 @@ Config section: `editor`.
 | Ctrl+PageUp                        | Previous query editor tab    | `EditorPrevTab`    |
 | Ctrl+PageDown                      | Next query editor tab        | `EditorNextTab`    |
 | Ctrl+Alt+Enter / Ctrl+E / Ctrl+R   | Execute query                | `EditorExecute`    |
+| Ctrl+W                             | Close editor tab             | `EditorCloseTab`   |
 
 ### Query result
 

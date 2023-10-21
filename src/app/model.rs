@@ -491,9 +491,14 @@ impl Model {
             .keys()
             .position(|some_id| some_id == editor_id);
 
-        // if let Some(editor_index) = editor_index {
-        let editor_index = editor_index.unwrap();
-        // if let Some(editor_index) = editor_index {
+        let editor_index = match editor_index {
+            Some(editor_index) => editor_index,
+            None => {
+                tracing::error!("editor index not found");
+                return;
+            }
+        };
+
         tracing::debug!("activating tab: {}", editor_index);
         self.app
             .attr(
@@ -623,6 +628,28 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
+                Msg::CloseTab(editor_id) => {
+                    self.query_editors.remove(&editor_id);
+                    self.update_editor_tabs();
+                    if let Err(e) = self.app.umount(&Id::Editor(editor_id)) {
+                        tracing::error!("error unmounting editor: {:?}", e);
+                    }
+                    if self.query_editors.is_empty() {
+                        self.shown_editor = None;
+                    } else {
+                        let first = self.query_editors.iter().next();
+                        let id = first.map(|(id, _)| Id::Editor(id.clone()));
+                        if let Some(Id::Editor(new_editor_id)) = id.clone() {
+                            let id = Id::Editor(new_editor_id.clone());
+                            if let Err(e) = self.app.active(&id) {
+                                tracing::error!("error activating editor: {:?}", e);
+                            }
+                            self.update_current_editor_tab(&new_editor_id);
+                            self.shown_editor = Some(new_editor_id);
+                        }
+                    }
+                    None
+                }
                 Msg::CycleNavigation => match self.app.focus() {
                     Some(&Id::Tree) => Some(Msg::ChangeFocus(Id::EditorPanel)),
                     Some(&Id::Editor(_)) => Some(Msg::ChangeFocus(Id::QueryResultTable)), // TODO: if error?

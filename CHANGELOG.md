@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Close editor tab with Ctrl+W.
+
 ## [v0.1.7] - 2023-10-21
 
 ### Added

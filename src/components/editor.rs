@@ -21,9 +21,9 @@ use tui_realm_stdlib::Input;
 #[cfg(feature = "clipboard")]
 use tui_realm_textarea::TEXTAREA_CMD_PASTE;
 use tui_realm_textarea::{
-    TextArea, TEXTAREA_CMD_DEL_NEXT_WORD, TEXTAREA_CMD_DEL_WORD, TEXTAREA_CMD_MOVE_WORD_BACK,
-    TEXTAREA_CMD_MOVE_WORD_FORWARD, TEXTAREA_CMD_NEWLINE, TEXTAREA_CMD_PASTE, TEXTAREA_CMD_REDO,
-    TEXTAREA_CMD_UNDO, TEXTAREA_CMD_MOVE_TOP, TEXTAREA_CMD_MOVE_BOTTOM,
+    TextArea, TEXTAREA_CMD_DEL_NEXT_WORD, TEXTAREA_CMD_DEL_WORD, TEXTAREA_CMD_MOVE_BOTTOM,
+    TEXTAREA_CMD_MOVE_TOP, TEXTAREA_CMD_MOVE_WORD_BACK, TEXTAREA_CMD_MOVE_WORD_FORWARD,
+    TEXTAREA_CMD_NEWLINE, TEXTAREA_CMD_PASTE, TEXTAREA_CMD_REDO, TEXTAREA_CMD_UNDO,
 };
 #[cfg(feature = "search")]
 use tui_realm_textarea::{
@@ -139,6 +139,9 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
                 }
                 Some(&TisqKeyboundAction::EditorMoveTabRight) => {
                     Some(Msg::MoveTabRight(self.editor_id.clone()))
+                }
+                Some(&TisqKeyboundAction::EditorCloseTab) => {
+                    Some(Msg::CloseTab(self.editor_id.clone()))
                 }
                 // Some(&TisqKeyboundAction::EditorBackspace) => {
                 //     self.perform(Cmd::Delete);

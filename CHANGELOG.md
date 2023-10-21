@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+## [v0.1.7] - 2023-10-21
+
 ### Added
 
 - Customize keybindings in configuration file.
@@ -85,7 +87,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Execution results view supporting only successful fetched results.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.6...HEAD
+[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.7...HEAD
+[v0.1.7]: https://github.com/strowk/tisq/compare/v0.1.6...v0.1.7
 [v0.1.6]: https://github.com/strowk/tisq/compare/v0.1.5...v0.1.6
 [v0.1.5]: https://github.com/strowk/tisq/compare/v0.1.4...v0.1.5
 [v0.1.4]: https://github.com/strowk/tisq/compare/v0.1.3...v0.1.4

@@ -101,8 +101,7 @@ Ctrl+e
 
 Sleep 4
 
-Ctrl+n
-
+Ctrl+l
 Sleep 1
 
 Down
@@ -117,7 +116,7 @@ Sleep 0.5
 PageDown
 Sleep 3
 
-Ctrl+n
+Ctrl+l
 Sleep 1
 
 Up

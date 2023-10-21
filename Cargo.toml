@@ -12,12 +12,15 @@ license = "MIT"
 # tuirealm = "1.9.0"
 # tuirealm = { git = 'https://github.com/strowk/tui-realm.git', branch = "issue-54-fix", features = [ "derive", "ratatui", "crossterm" ] }
 # tui-realm-textarea = {path = "../tui-realm-textarea"}
-tui-realm-textarea = { git = "https://github.com/strowk/tui-realm-textarea.git", branch = "improvements", version = "1.1.2" }
+tui-realm-textarea = { git = "https://github.com/strowk/tui-realm-textarea.git", branch = "improvements", version = "1.1.2", features = [
+    "clipboard"
+]}
 # tuirealm = {path = '../tui-realm', features = ["derive", "ratatui", "crossterm"]}
 tuirealm = { git = "https://github.com/strowk/tui-realm.git", branch = "improvements", features = [
  "derive", 
  "ratatui", 
- "crossterm"
+ "crossterm",
+ "serialize"
 ] , version = "1.9.0" }
 # tui-realm-textarea = "^1.1.0"
 # tui-realm-stdlib = "1.3.0"

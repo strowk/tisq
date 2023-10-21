@@ -18,9 +18,12 @@ use tuirealm::{AttrValue, Attribute, Update};
 // -- internal
 mod app;
 mod components;
+mod config;
 mod files;
 use app::model::Model;
 use uuid::Uuid;
+
+use crate::config::TisqConfig;
 
 // Let's define the messages handled by our app. NOTE: it must derive `PartialEq`
 #[derive(Debug, PartialEq)]
@@ -137,11 +140,15 @@ fn main() -> eyre::Result<()> {
     }
     .init();
 
-    // Setup model
-    let mut model = Model::new(match FILES_ROOT.as_ref() {
+    let files_root = match FILES_ROOT.as_ref() {
         Ok(root) => root,
         Err(err) => return Err(eyre::eyre!("Failed to open tisq root directory: {}", err)),
-    });
+    };
+
+    let config = TisqConfig::read_or_create(files_root)?;
+
+    // Setup model
+    let mut model = Model::new(files_root, config);
 
     // Enter alternate screen
     let _ = model.terminal.enter_alternate_screen();

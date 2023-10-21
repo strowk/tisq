@@ -8,7 +8,8 @@ use tuirealm::{
 use uuid::Uuid;
 
 use crate::{
-    app::{DbResponse, TisqEvent}, Msg,
+    app::{DbResponse, SectionKeybindings, TisqEvent, TisqKeyboundAction},
+    Msg,
 };
 
 pub enum BrowserTreeId {
@@ -47,8 +48,9 @@ impl BrowserTreeId {
 }
 
 #[derive(MockComponent)]
-pub struct BrowserTree {
+pub(crate) struct BrowserTree {
     component: TreeView,
+    keybindings: SectionKeybindings<TisqKeyboundAction>,
 }
 
 impl BrowserTree {
@@ -59,13 +61,18 @@ impl BrowserTree {
         self.component.set_tree(tree);
     }
 
-    pub fn new(tree: Tree, initial_node: Option<String>) -> Self {
+    pub fn new(
+        tree: Tree,
+        initial_node: Option<String>,
+        keybindings: SectionKeybindings<TisqKeyboundAction>,
+    ) -> Self {
         // Preserve initial node if exists
         let initial_node = match initial_node {
             Some(id) if tree.root().query(&id).is_some() => id,
             _ => tree.root().id().to_string(),
         };
         BrowserTree {
+            keybindings,
             component: TreeView::default()
                 .foreground(Color::Reset)
                 .borders(
@@ -85,6 +92,39 @@ impl BrowserTree {
                 .initial_node(initial_node),
         }
     }
+
+    fn open_query_editor(&self) -> Option<Msg> {
+        let selected_id = self.component.tree_state().selected();
+        let selected_id = match selected_id {
+            Some(id) => id,
+            None => return Some(Msg::None),
+        };
+        let database = match BrowserTreeId::parse_str(&selected_id) {
+            Some(BrowserTreeId::Database(_server_id, database)) => database,
+            _ => return Some(Msg::None),
+        };
+
+        if let Some(parent_node) = self
+            .component
+            .tree()
+            .root()
+            .parent(&selected_id.to_string())
+        {
+            let server_id = match BrowserTreeId::parse_str(parent_node.id()) {
+                Some(BrowserTreeId::Server(server_id)) => server_id,
+                _ => return Some(Msg::None),
+            };
+            let server_id = match Uuid::parse_str(&server_id) {
+                Ok(uuid) => uuid,
+                Err(_) => {
+                    tracing::error!("Could not parse server id: {}", server_id);
+                    return Some(Msg::None);
+                }
+            };
+            return Some(Msg::OpenQueryEditor(server_id, database));
+        }
+        return Some(Msg::None);
+    }
 }
 
 #[derive(PartialEq, Clone, Eq, Debug)]
@@ -98,6 +138,19 @@ impl PartialOrd for SentTree {
 
 impl Component<Msg, TisqEvent> for BrowserTree {
     fn on(&mut self, ev: Event<TisqEvent>) -> Option<Msg> {
+        let res_message = match ev {
+            Event::Keyboard(kb_event) => match self.keybindings.get_action(&kb_event) {
+                Some(TisqKeyboundAction::BrowserAddServer) => Some(Msg::StartAddingServer),
+                Some(TisqKeyboundAction::BrowserDatabaseOpenQueryEditor) => {
+                    self.open_query_editor()
+                }
+                _ => None,
+            },
+            _ => None,
+        };
+        if let Some(msg) = res_message {
+            return Some(msg);
+        }
         let _result = match ev {
             Event::User(TisqEvent::TreeReloaded(SentTree(tree))) => {
                 self.set_tree(tree);
@@ -151,47 +204,16 @@ impl Component<Msg, TisqEvent> for BrowserTree {
 
                 return Some(Msg::None);
             }
-            Event::Keyboard(KeyEvent {
-                code: Key::Char('q'),
-                kind: KeyEventKind::Press,
-                modifiers: KeyModifiers::NONE,
-            }) => {
-                let selected_id = self.component.tree_state().selected();
-                let selected_id = match selected_id {
-                    Some(id) => id,
-                    None => return Some(Msg::None),
-                };
-                let database = match BrowserTreeId::parse_str(&selected_id) {
-                    Some(BrowserTreeId::Database(_server_id, database)) => database,
-                    _ => return Some(Msg::None),
-                };
-
-                if let Some(parent_node) = self
-                    .component
-                    .tree()
-                    .root()
-                    .parent(&selected_id.to_string())
-                {
-                    let server_id = match BrowserTreeId::parse_str(parent_node.id()) {
-                        Some(BrowserTreeId::Server(server_id)) => server_id,
-                        _ => return Some(Msg::None),
-                    };
-                    let server_id = match Uuid::parse_str(&server_id) {
-                        Ok(uuid) => uuid,
-                        Err(_) => {
-                            tracing::error!("Could not parse server id: {}", server_id);
-                            return Some(Msg::None);
-                        }
-                    };
-                    return Some(Msg::OpenQueryEditor(server_id, database));
-                }
-                return Some(Msg::None);
-            }
-            Event::Keyboard(KeyEvent {
-                code: Key::Char('a'),
-                kind: KeyEventKind::Press,
-                modifiers: KeyModifiers::NONE,
-            }) => return Some(Msg::StartAddingServer),
+            // Event::Keyboard(KeyEvent {
+            //     code: Key::Char('q'),
+            //     kind: KeyEventKind::Press,
+            //     modifiers: KeyModifiers::NONE,
+            // }) => return self.open_query_editor(),
+            // Event::Keyboard(KeyEvent {
+            //     code: Key::Char('a'),
+            //     kind: KeyEventKind::Press,
+            //     modifiers: KeyModifiers::NONE,
+            // }) => return Some(Msg::StartAddingServer),
             // Event::Keyboard(KeyEvent {
             //     code: Key::Left | Key::Right,
             //     kind: KeyEventKind::Press,

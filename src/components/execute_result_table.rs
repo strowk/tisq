@@ -1,5 +1,3 @@
-
-
 use tui_realm_stdlib::Table;
 use tuirealm::command::{Cmd, CmdResult, Direction, Position};
 use tuirealm::event::{KeyEventKind, KeyModifiers};
@@ -14,8 +12,7 @@ use tuirealm::{
 use tuirealm::{AttrValue, Attribute};
 // tui
 
-
-use crate::app::{DbResponse, TisqEvent};
+use crate::app::{DbResponse, SectionKeybindings, TisqEvent, TisqKeyboundAction};
 use crate::Msg;
 
 #[derive(PartialEq, PartialOrd, Clone, Eq, Debug)]
@@ -29,23 +26,27 @@ pub(crate) struct ExecuteResultTable {
     component: Table,
     result: Option<QueryResult>,
     column_offset: usize,
+    keybindings: SectionKeybindings<TisqKeyboundAction>,
 }
 
-impl Default for ExecuteResultTable {
-    fn default() -> Self {
+impl ExecuteResultTable {
+    pub(crate) fn new(keybindings: SectionKeybindings<TisqKeyboundAction>) -> Self {
         Self {
             column_offset: 0,
             result: None,
+            keybindings,
             component: Table::default()
                 .borders(
                     Borders::default()
-                        .modifiers(BorderType::Thick)
-                        .sides(BorderSides::NONE)
-                        .color(Color::Yellow),
+                        // .modifiers(BorderType::Thick)
+                        // .modifiers(BorderType::Plain)
+                        .sides(BorderSides::NONE), // .sides(BorderSides::TOP)
+                                                   // .color(Color::LightCyan),
                 )
                 .title("Query Result", Alignment::Center)
                 .scroll(true)
                 .highlighted_color(Color::LightYellow)
+                // .highlighted_color(Color::LightCyan)
                 .highlighted_str("🚀")
                 .rewind(true)
                 .step(4)
@@ -55,9 +56,7 @@ impl Default for ExecuteResultTable {
                 .widths(&[30, 20, 50]),
         }
     }
-}
 
-impl ExecuteResultTable {
     fn update_result(&mut self) {
         if let Some(result) = self.result.as_ref() {
             let mut builder = TableBuilder::default();
@@ -157,6 +156,33 @@ impl ExecuteResultTable {
 impl Component<Msg, TisqEvent> for ExecuteResultTable {
     fn on(&mut self, ev: Event<TisqEvent>) -> Option<Msg> {
         // println!("ExecuteResultTable event: {:?}", ev);
+        if let Event::Keyboard(kb_event) = ev {
+            match self.keybindings.get_action(&kb_event) {
+                Some(TisqKeyboundAction::ResultOffsetColumnLeft) => {
+                    self.column_offset = if self.column_offset > 0 {
+                        self.column_offset - 1
+                    } else {
+                        0
+                    };
+                    self.update_result();
+                    return Some(Msg::None);
+                }
+                Some(TisqKeyboundAction::ResultOffsetColumnRight) => {
+                    self.column_offset = if let Some(result) = self.result.as_ref() {
+                        if self.column_offset < result.headers.len() - 1 {
+                            self.column_offset + 1
+                        } else {
+                            self.column_offset
+                        }
+                    } else {
+                        0
+                    };
+                    self.update_result();
+                    return Some(Msg::None);
+                }
+                _ => (),
+            }
+        };
         let _ = match ev {
             Event::User(TisqEvent::DbResponse(DbResponse::Executed(_, headers, data))) => {
                 self.set_result(QueryResult { headers, data }, 0);
@@ -169,63 +195,62 @@ impl Component<Msg, TisqEvent> for ExecuteResultTable {
             //     self.set_result(result);
             //     return Some(Msg::None);
             // }
-            Event::Keyboard(KeyEvent {
-                code: code @ (Key::Left | Key::Right),
-                kind: KeyEventKind::Press,
-                modifiers: KeyModifiers::CONTROL,
-                ..
-            }) => {
-                if let Some(result) = self.result.as_ref() {
-                    self.column_offset = match code {
-                        Key::Left => {
-                            if self.column_offset > 0 {
-                                self.column_offset - 1
-                            } else {
-                                0
-                            }
-                        }
-                        Key::Right => {
-                            if self.column_offset < result.headers.len() - 1 {
-                                self.column_offset + 1
-                            } else {
-                                self.column_offset
-                            }
-                        }
-                        _ => 0,
-                    };
-                    self.update_result();
-                }
-                CmdResult::None
-            }
+            // Event::Keyboard(KeyEvent {
+            //     code: code @ (Key::Left | Key::Right),
+            //     kind: KeyEventKind::Press,
+            //     modifiers: KeyModifiers::CONTROL,
+            // }) => {
+            //     if let Some(result) = self.result.as_ref() {
+            //         self.column_offset = match code {
+            //             Key::Left => {
+            //                 if self.column_offset > 0 {
+            //                     self.column_offset - 1
+            //                 } else {
+            //                     0
+            //                 }
+            //             }
+            //             Key::Right => {
+            //                 if self.column_offset < result.headers.len() - 1 {
+            //                     self.column_offset + 1
+            //                 } else {
+            //                     self.column_offset
+            //                 }
+            //             }
+            //             _ => 0,
+            //         };
+            //         self.update_result();
+            //     }
+            //     CmdResult::None
+            // }
             Event::Keyboard(KeyEvent {
                 code: Key::Down,
                 kind: KeyEventKind::Press,
-                ..
+                modifiers: KeyModifiers::NONE,
             }) => self.perform(Cmd::Move(Direction::Down)),
             Event::Keyboard(KeyEvent {
                 code: Key::Up,
                 kind: KeyEventKind::Press,
-                ..
+                modifiers: KeyModifiers::NONE,
             }) => self.perform(Cmd::Move(Direction::Up)),
             Event::Keyboard(KeyEvent {
                 code: Key::PageDown,
                 kind: KeyEventKind::Press,
-                ..
+                modifiers: KeyModifiers::NONE,
             }) => self.perform(Cmd::Scroll(Direction::Down)),
             Event::Keyboard(KeyEvent {
                 code: Key::PageUp,
                 kind: KeyEventKind::Press,
-                ..
+                modifiers: KeyModifiers::NONE,
             }) => self.perform(Cmd::Scroll(Direction::Up)),
             Event::Keyboard(KeyEvent {
                 code: Key::Home,
                 kind: KeyEventKind::Press,
-                ..
+                modifiers: KeyModifiers::NONE,
             }) => self.perform(Cmd::GoTo(Position::Begin)),
             Event::Keyboard(KeyEvent {
                 code: Key::End,
                 kind: KeyEventKind::Press,
-                ..
+                modifiers: KeyModifiers::NONE,
             }) => self.perform(Cmd::GoTo(Position::End)),
             _ => CmdResult::None,
         };

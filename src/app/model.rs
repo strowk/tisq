@@ -3,14 +3,18 @@
 //! app model
 
 use crate::app::event_dispatcher::EventDispatcherPort;
+use crate::app::keybindings::{BROWSER_SECTION, GLOBAL_SECTION, QUERY_RESULT_SECTION};
 use crate::components::{
     AddServerForm, BrowserTree, Editor, EditorTabs, ErrorResult, ExecuteResultTable,
     FormSubmitListener, GlobalListener, InputText, SentTree, ACTIVE_TAB_INDEX,
 };
 
+use super::config::TisqConfig;
 use super::connection::{self, DbRequest, DbResponse};
+use super::keybindings::{self, Keybindings, EDITOR_SECTION};
 use super::storage::{NewServer, Storage};
-use super::{storage, Id, Msg, TisqEvent};
+use super::{storage, Id, Msg, SectionKeybindings, TisqEvent, TisqKeyboundAction};
+use kv::Key;
 use ordered_hash_map::OrderedHashMap;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -61,6 +65,8 @@ pub struct Model {
     // connection_manager_rx: Receiver<DbResponse>,
     // connections: HashMap<Uuid, Connection>,
     execute_result_state: ExecuteResultState,
+
+    keybindings: Keybindings<TisqKeyboundAction>,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
@@ -74,7 +80,7 @@ struct EditorMetadata {
 }
 
 impl Model {
-    pub(crate) fn new(files_root: &PathBuf) -> Self {
+    pub(crate) fn new(files_root: &PathBuf, config: TisqConfig) -> Self {
         let storage = storage::Storage::open(files_root).unwrap();
 
         let event_dispatcher = EventDispatcherPort::new();
@@ -102,8 +108,10 @@ impl Model {
             }
         });
 
+        let keybindings = Keybindings::new(&config.keybindings.unwrap_or_default());
+
         Self {
-            app: Self::init_app(&storage, Box::new(event_dispatcher.clone())),
+            app: Self::init_app(&keybindings, &storage, Box::new(event_dispatcher.clone())),
             quit: false,
             redraw: true,
             terminal: TerminalBridge::new().expect("Cannot initialize terminal"),
@@ -123,6 +131,8 @@ impl Model {
             // connection_manager_rx: back_rx,
             // connections: HashMap::new(),
             execute_result_state: ExecuteResultState::FetchedTable,
+
+            keybindings,
         }
     }
 
@@ -237,14 +247,21 @@ impl Model {
         node
     }
 
-    fn mount_editor(&mut self, id: EditorId) {
+    fn mount_editor(&mut self, id: EditorId, keybindings: SectionKeybindings<TisqKeyboundAction>) {
         assert!(self
             .app
-            .mount(Id::Editor(id.clone()), Box::new(Editor::new(id)), vec![])
+            .mount(
+                Id::Editor(id.clone()),
+                Box::new(Editor::new(id, keybindings)),
+                vec![]
+            )
             .is_ok());
     }
 
-    fn mount_editor_envelope(app: &mut TisqApplication) {
+    fn mount_editor_envelope(
+        app: &mut TisqApplication,
+        keybindings: SectionKeybindings<TisqKeyboundAction>,
+    ) {
         // Mount tabs
         assert!(app
             .mount(Id::EditorTabs, Box::new(EditorTabs::new()), vec![])
@@ -259,7 +276,7 @@ impl Model {
         assert!(app
             .mount(
                 Id::QueryResultTable,
-                Box::new(ExecuteResultTable::default()),
+                Box::new(ExecuteResultTable::new(keybindings)),
                 vec![
                     Sub::new(
                         SubEventClause::User(TisqEvent::DbResponse(
@@ -334,6 +351,7 @@ impl Model {
     // }
 
     fn init_app(
+        keybindings: &Keybindings<TisqKeyboundAction>,
         storage: &storage::Storage,
         event_dispatcher: Box<EventDispatcherPort<TisqEvent>>,
     ) -> TisqApplication {
@@ -376,14 +394,26 @@ impl Model {
                         // std::env::current_dir().ok().unwrap().as_path(),
                         // 3
                         // )
-                        Self::browser_tree(storage).unwrap()
+                        Self::browser_tree(storage).unwrap(),
                     ),
-                    Some("servers".to_string())
+                    Some("servers".to_string()),
+                    keybindings
+                        .by_section
+                        .get(BROWSER_SECTION)
+                        .expect("should have browser section keybindings")
+                        .clone(),
                 )),
                 vec![]
             )
             .is_ok());
-        Self::mount_editor_envelope(&mut app);
+        Self::mount_editor_envelope(
+            &mut app,
+            keybindings
+                .by_section
+                .get(QUERY_RESULT_SECTION)
+                .expect("should have query result section keybindings")
+                .clone(),
+        );
         // Mount clock, subscribe to tick
         // assert!(app
         //     .mount(
@@ -413,11 +443,19 @@ impl Model {
         //         Vec::default()
         //     )
         //     .is_ok());
+        let global_listener = GlobalListener::new(
+            keybindings
+                .by_section
+                .get(GLOBAL_SECTION)
+                .expect("should have global section keybindings")
+                .clone(),
+        );
+        let global_subscriptions = global_listener.subscriptions();
         assert!(app
             .mount(
                 Id::GlobalListener,
-                Box::new(GlobalListener::default()),
-                GlobalListener::subscriptions()
+                Box::new(global_listener),
+                global_subscriptions
             )
             .is_ok());
 
@@ -594,7 +632,7 @@ impl Update<Msg> for Model {
                 Msg::NavigateRight | Msg::NavigateLeft => match self.app.focus() {
                     Some(&Id::Tree) => Some(Msg::ChangeFocus(Id::EditorPanel)),
                     Some(&Id::Editor(_)) => Some(Msg::ChangeFocus(Id::Tree)),
-                    Some(&Id::QueryResultTable) =>  Some(Msg::ChangeFocus(Id::Tree)),
+                    Some(&Id::QueryResultTable) => Some(Msg::ChangeFocus(Id::Tree)),
                     _ => None,
                 },
                 Msg::NavigateUp | Msg::NavigateDown => match self.app.focus() {
@@ -646,7 +684,15 @@ impl Update<Msg> for Model {
 
                         return None;
                     }
-                    self.mount_editor(editor_id.clone());
+
+                    let section_keybindings = self
+                        .keybindings
+                        .by_section
+                        .get(EDITOR_SECTION)
+                        .unwrap()
+                        .clone();
+
+                    self.mount_editor(editor_id.clone(), section_keybindings);
 
                     self.app.active(&Id::Editor(editor_id.clone())).unwrap();
                     self.shown_editor = Some(editor_id.clone());

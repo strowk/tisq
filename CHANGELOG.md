@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Customize keybindings in configuration file.
+
 ### Changed
 
 - Use home directory `~/.tisq` for storage instead of current.

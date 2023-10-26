@@ -28,7 +28,7 @@ impl GenericArrayTypeWriter<'_, PgTypeInfo, PgRow, Postgres> for PgArrayWriter {
 impl Executing for PgConnection {
     async fn execute_sqlx(
         &mut self,
-        query: String,
+        query: &str,
     ) -> Result<(Vec<String>, Vec<Vec<String>>), sqlx::Error> {
         let mut headers: Vec<String> = vec![];
 

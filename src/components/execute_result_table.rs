@@ -12,7 +12,7 @@ use tuirealm::{
 use tuirealm::{AttrValue, Attribute};
 // tui
 
-use crate::app::{DbResponse, SectionKeybindings, TisqEvent, TisqKeyboundAction};
+use crate::app::{DbResponse, EditorId, SectionKeybindings, TisqEvent, TisqKeyboundAction};
 use crate::Msg;
 
 #[derive(PartialEq, PartialOrd, Clone, Eq, Debug)]
@@ -187,6 +187,13 @@ impl Component<Msg, TisqEvent> for ExecuteResultTable {
             Event::User(TisqEvent::DbResponse(DbResponse::Executed(_, headers, data))) => {
                 self.set_result(QueryResult { headers, data }, 0);
                 return Some(Msg::ShowFetchedTable);
+            }
+            Event::User(TisqEvent::DbResponse(DbResponse::ConnectionIsDown(id, name, query))) => {
+                // self.set_result(QueryResult { headers, data }, 0);
+                return Some(Msg::ReconnectAndExecuteQuery(
+                    EditorId::new(id, name),
+                    query,
+                ));
             }
             // Event::User(TisqEvent::DbResponse(DbResponse::Error(_, data))) => {
             //     return Some(Msg::None);

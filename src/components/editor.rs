@@ -186,6 +186,15 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
 
         res_message.or_else(|| {
             match ev {
+                Event::User(TisqEvent::EditorContentReset(editor_id, content)) => {
+                    // self.component.attr(attr, value)
+                    // tracing::debug!("editor content reset for {:?}, check in {:?}", editor_id, self.editor_id);
+                    if self.editor_id != editor_id {
+                        return None;
+                    }
+                    self.component.add_text(&content);
+                    Some(Msg::None)
+                },
                 // Event::Keyboard(KeyEvent {
                 //     code: Key::Left | Key::Right,
                 //     kind: KeyEventKind::Press,

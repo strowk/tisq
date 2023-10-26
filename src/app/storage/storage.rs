@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 pub(crate) struct Storage {
-    store: Store,
+    pub(super) store: Store,
 }
 
 const SERVERS_BUCKET: &str = "servers";

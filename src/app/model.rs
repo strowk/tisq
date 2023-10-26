@@ -11,10 +11,9 @@ use crate::components::{
 
 use super::config::TisqConfig;
 use super::connection::{self, DbRequest, DbResponse};
-use super::keybindings::{self, Keybindings, EDITOR_SECTION};
-use super::storage::{NewServer, Storage};
+use super::keybindings::{Keybindings, EDITOR_SECTION};
+use super::storage::{NewServer, Storage, StoredServer};
 use super::{storage, Id, Msg, SectionKeybindings, TisqEvent, TisqKeyboundAction};
-use kv::Key;
 use ordered_hash_map::OrderedHashMap;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -69,10 +68,19 @@ pub struct Model {
     keybindings: Keybindings<TisqKeyboundAction>,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug, Clone)]
+#[derive(PartialEq, PartialOrd, Eq, Hash, Debug, Clone)]
 pub struct EditorId {
     server_id: Uuid,
     database: String,
+}
+
+impl EditorId {
+    pub fn new(server_id: Uuid, database: String) -> Self {
+        Self {
+            server_id,
+            database,
+        }
+    }
 }
 
 struct EditorMetadata {
@@ -110,7 +118,7 @@ impl Model {
 
         let keybindings = Keybindings::new(&config.keybindings.unwrap_or_default());
 
-        Self {
+        let mut app = Self {
             app: Self::init_app(&keybindings, &storage, Box::new(event_dispatcher.clone())),
             quit: false,
             redraw: true,
@@ -133,7 +141,9 @@ impl Model {
             execute_result_state: ExecuteResultState::FetchedTable,
 
             keybindings,
-        }
+        };
+        app.restore_editors();
+        app
     }
 
     pub fn view(&mut self) {
@@ -252,8 +262,17 @@ impl Model {
             .app
             .mount(
                 Id::Editor(id.clone()),
-                Box::new(Editor::new(id, keybindings)),
-                vec![]
+                Box::new(Editor::new(id.clone(), keybindings)),
+                vec![
+                    Sub::new(
+                        SubEventClause::User(TisqEvent::EditorContentReset(
+                            id.clone(),
+                            "".to_string()
+                        )),
+                        SubClause::Always
+                    ),
+                    Sub::new(SubEventClause::WindowResize, SubClause::Always)
+                ]
             )
             .is_ok());
     }
@@ -485,6 +504,37 @@ impl Model {
         id
     }
 
+    fn restore_editors(&mut self) {
+        let editors = self.storage.read_editors().unwrap();
+
+        for editor in editors {
+            let section_keybindings = self
+                .keybindings
+                .by_section
+                .get(EDITOR_SECTION)
+                .unwrap()
+                .clone();
+            let id = EditorId {
+                server_id: editor.server_id,
+                database: editor.database.clone(),
+            };
+            let metadata: EditorMetadata = EditorMetadata {
+                name: editor.database.clone(),
+            };
+            self.query_editors.insert(id.clone(), metadata);
+            self.mount_editor(id.clone(), section_keybindings);
+
+            self.event_dispatcher_port
+                .dispatch(Event::User(TisqEvent::EditorContentReset(
+                    id.clone(),
+                    editor.content,
+                )));
+
+        }
+        self.update_editor_tabs();
+        self.activate_first_editor(); // TODO: save and restore last active editor
+    }
+
     fn update_current_editor_tab(&mut self, editor_id: &EditorId) {
         let editor_index = self
             .query_editors
@@ -617,6 +667,45 @@ impl Model {
             )
             .unwrap();
     }
+
+    fn activate_first_editor(&mut self) {
+        let first = self.query_editors.iter().next();
+        let id = first.map(|(id, _)| Id::Editor(id.clone()));
+        if let Some(Id::Editor(new_editor_id)) = id.clone() {
+            let id = Id::Editor(new_editor_id.clone());
+            if let Err(e) = self.app.active(&id) {
+                tracing::error!("error activating editor: {:?}", e);
+            }
+            self.update_current_editor_tab(&new_editor_id);
+            self.shown_editor = Some(new_editor_id);
+        }
+    }
+
+    fn connect_to_server(&mut self, server: &StoredServer) {
+        let connection_url = server
+            .connection_properties
+            .get("url")
+            .expect("connection url not found")
+            .clone();
+        self.connection_manager_tx
+            .send(DbRequest::ConnectToServer(server.id, connection_url))
+            .unwrap();
+    }
+
+    fn connect_to_database(&mut self, server: &StoredServer, database: String) {
+        let connection_url = server
+            .connection_properties
+            .get("url")
+            .expect("connection url not found")
+            .clone();
+        self.connection_manager_tx
+            .send(DbRequest::ConnectToDatabase(
+                server.id,
+                database,
+                connection_url,
+            ))
+            .unwrap();
+    }
 }
 
 // Let's implement Update for model
@@ -628,6 +717,16 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
+                Msg::ReconnectAndExecuteQuery(editor_id, query) => {
+                    let server = self
+                        .storage
+                        .get_server(editor_id.server_id)
+                        .unwrap()
+                        .unwrap(); // TODO: display error properly
+                    self.connect_to_server(&server);
+                    self.connect_to_database(&server, editor_id.database.clone());
+                    Some(Msg::ExecuteQuery(editor_id, query))
+                }
                 Msg::CloseTab(editor_id) => {
                     self.query_editors.remove(&editor_id);
                     self.update_editor_tabs();
@@ -637,16 +736,7 @@ impl Update<Msg> for Model {
                     if self.query_editors.is_empty() {
                         self.shown_editor = None;
                     } else {
-                        let first = self.query_editors.iter().next();
-                        let id = first.map(|(id, _)| Id::Editor(id.clone()));
-                        if let Some(Id::Editor(new_editor_id)) = id.clone() {
-                            let id = Id::Editor(new_editor_id.clone());
-                            if let Err(e) = self.app.active(&id) {
-                                tracing::error!("error activating editor: {:?}", e);
-                            }
-                            self.update_current_editor_tab(&new_editor_id);
-                            self.shown_editor = Some(new_editor_id);
-                        }
+                        self.activate_first_editor();
                     }
                     None
                 }
@@ -695,7 +785,7 @@ impl Update<Msg> for Model {
                 }
                 Msg::OpenQueryEditor(server_id, database) => {
                     let server = self.storage.get_server(server_id).unwrap().unwrap();
-                    let server_name = server.name;
+                    let server_name = server.name.clone();
 
                     let editor_id = EditorId {
                         server_id,
@@ -733,29 +823,23 @@ impl Update<Msg> for Model {
 
                     // This is to make sure we have an active connection
                     // TODO: process response as well
-                    let props = server.connection_properties;
-                    let connection_url =
-                        props.get("url").expect("connection url not found").clone();
-                    self.connection_manager_tx
-                        .send(DbRequest::ConnectToDatabase(
-                            server_id,
-                            database,
-                            connection_url,
-                        ))
-                        .unwrap();
+                    self.connect_to_database(&server, database);
 
                     None
                 }
                 Msg::OpenConnection(server_id) => {
                     let server = self.storage.get_server(server_id).unwrap();
                     let server = server.unwrap();
-                    let props = server.connection_properties;
-                    let connection_url =
-                        props.get("url").expect("connection url not found").clone();
 
-                    self.connection_manager_tx
-                        .send(DbRequest::ConnectToServer(server_id, connection_url))
-                        .unwrap();
+                    // let props = server.connection_properties;
+                    // let connection_url =
+                    //     props.get("url").expect("connection url not found").clone();
+
+                    // self.connection_manager_tx
+                    //     .send(DbRequest::ConnectToServer(server.id, connection_url))
+                    //     .unwrap();
+
+                    self.connect_to_server(&server);
 
                     // let connection: eyre::Result<Connection> =
                     //     task::block_on(task::spawn(async move {
@@ -909,6 +993,34 @@ impl Update<Msg> for Model {
                     None
                 }
                 Msg::AppClose => {
+                    if let Some(editor_id) = &self.shown_editor {
+                        let mut text_to_store: String = String::new();
+                        if let Ok(editor_state) = self.app.state(&Id::Editor(editor_id.clone())) {
+                            if let State::Vec(lines) = editor_state {
+                                let text = lines
+                                    .into_iter()
+                                    .flat_map(|line| match line {
+                                        StateValue::String(line) => Some(line),
+                                        _ => None,
+                                    })
+                                    .collect::<Vec<String>>()
+                                    .join("\n");
+                                if !text.is_empty() {
+                                    text_to_store = text;
+                                }
+                            }
+                        }
+
+                        self.storage
+                            .put_editor(
+                                Storage::new_editor_id(
+                                    editor_id.server_id.clone(),
+                                    editor_id.database.clone(),
+                                ),
+                                text_to_store,
+                            )
+                            .unwrap();
+                    }
                     self.quit = true; // Terminate
                     None
                 }

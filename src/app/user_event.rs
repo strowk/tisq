@@ -1,11 +1,12 @@
 use crate::components::SentTree;
 
-use super::connection::DbResponse;
+use super::{connection::DbResponse, EditorId};
 
 #[derive(PartialOrd, Clone, Eq, Debug)]
 pub(crate) enum TisqEvent {
     TreeReloaded(SentTree),
     DbResponse(DbResponse),
+    EditorContentReset(EditorId, String), // TODO: use attr instead of UserEvent
 }
 
 // For the purposes of subscriptions we only care about the type of the event
@@ -15,6 +16,7 @@ impl PartialEq for TisqEvent {
         match (self, other) {
             (Self::TreeReloaded(_), Self::TreeReloaded(_)) => true,
             (Self::DbResponse(_), Self::DbResponse(_)) => true,
+            (Self::EditorContentReset(_, _), Self::EditorContentReset(_, _)) => true,
             _ => false,
         }
     }

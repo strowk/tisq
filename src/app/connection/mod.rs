@@ -6,11 +6,9 @@ use std::{
 use async_std::task;
 
 use sqlx::{
-    postgres::{PgConnectOptions},
-    Column, Connection as SqlxConnection, Executor, PgConnection, Row,
+    postgres::PgConnectOptions, Column, Connection as SqlxConnection, Executor, PgConnection, Row,
 };
 use uuid::Uuid;
-
 
 mod executing;
 mod posgres;
@@ -88,6 +86,7 @@ pub(crate) enum DbResponse {
     Connected(Uuid),
     Executed(Uuid, Vec<String>, Vec<Vec<String>>),
     Error(Uuid, String),
+    ConnectionIsDown(Uuid, String, String),
     None,
 }
 
@@ -144,8 +143,9 @@ impl ConnectionsManager {
                 }
             }
             DbRequest::Execute(id, name, query) => {
-                match task::block_on(self.execute(query, id, name)) {
-                    Ok((headers, data)) => DbResponse::Executed(id, headers, data),
+                match task::block_on(self.execute(&query, id, &name)) {
+                    Ok(Some((headers, data))) => DbResponse::Executed(id, headers, data),
+                    Ok(None) => DbResponse::ConnectionIsDown(id, name, query),
                     Err(e) => Self::process_db_error(e, id),
                 }
             }
@@ -183,20 +183,26 @@ impl ConnectionsManager {
 
     async fn execute(
         &mut self,
-        query: String,
+        query: &str,
         id: Uuid,
-        name: String,
-    ) -> Result<(Vec<String>, Vec<Vec<String>>), sqlx::Error> {
+        name: &str,
+    ) -> Result<Option<(Vec<String>, Vec<Vec<String>>)>, sqlx::Error> {
         tracing::info!("Executing query: {}", query);
         let key = ConnectionKey {
-            name,
+            name: name.to_string(),
             server_id: id,
         };
-        let connection = self.connections.get_mut(&key).unwrap();
+        let connection = match self.connections.get_mut(&key) {
+            Some(connection) => connection,
+            None => return Ok(None),
+        };
         let connection = match &mut connection.internal {
             TypedConnection::Postgres(connection) => connection,
         };
 
-        connection.execute_sqlx(query).await
+        connection
+            .execute_sqlx(query)
+            .await
+            .map(|(headers, data)| Some((headers, data)))
     }
 }

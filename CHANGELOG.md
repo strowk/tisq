@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Close editor tab with Ctrl+W.
+- Save and restore editors tabs content.
 
 ## [v0.1.7] - 2023-10-21
 

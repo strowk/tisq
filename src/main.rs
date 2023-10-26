@@ -31,6 +31,7 @@ pub(crate) enum Msg {
     AppClose,
 
     ExecuteQuery(EditorId, String),
+    ReconnectAndExecuteQuery(EditorId, String),
     ChangeFocus(Id),
 
     NavigateRight,

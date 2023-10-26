@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+## [v0.1.8] - 2023-10-26
+
 ### Added
 
 - Close editor tab with Ctrl+W.
@@ -92,7 +94,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Execution results view supporting only successful fetched results.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.7...HEAD
+[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.8...HEAD
+[v0.1.8]: https://github.com/strowk/tisq/compare/v0.1.7...v0.1.8
 [v0.1.7]: https://github.com/strowk/tisq/compare/v0.1.6...v0.1.7
 [v0.1.6]: https://github.com/strowk/tisq/compare/v0.1.5...v0.1.6
 [v0.1.5]: https://github.com/strowk/tisq/compare/v0.1.4...v0.1.5

@@ -9,6 +9,8 @@ Features:
 - Write and execute SQL queries.
 - View query execution results in table.
 - Switch between multiple query tabs with different connections.
+- Customizable keybindings by config TOML file.
+- Save query editors content on exit and restore on start.
 
 ## Status
 
@@ -111,7 +113,7 @@ Config section: `result`.
 ## Roadmap
 
 - [x] Customizable keybindings by config TOML file
-- [ ] Save query editors content on exit and restore on start
+- [x] Save query editors content on exit and restore on start
 - [ ] Add other objects to tree view (tables, views, functions, etc)
 - [ ] Add schemas to tree view
 - [ ] Show table columns in tree view

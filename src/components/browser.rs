@@ -13,24 +13,45 @@ use crate::{
 };
 
 pub enum BrowserTreeId {
-    Server(String),
-    Database(String, String),
+    Server(Uuid),
+    Database(Uuid, String),
+    Schema(Uuid, String, String),
 }
 
 impl BrowserTreeId {
+    fn parse_server_uuid(s: &str) -> Option<Uuid> {
+        match Uuid::parse_str(s) {
+            Ok(uuid) => Some(uuid),
+            Err(_) => {
+                tracing::error!("Could not parse server id: {}", s);
+                None
+            }
+        }
+    }
     fn parse_str(s: &str) -> Option<Self> {
         let mut parts = s.splitn(2, ':');
         let section = parts.next()?;
+
         match section {
             "server" => {
                 let node: &str = parts.next()?;
-                Some(Self::Server(node.to_string()))
+                let server_id = Self::parse_server_uuid(node)?;
+                Some(Self::Server(server_id))
             }
             "database" => {
                 let node: &str = parts.next()?;
                 let mut parts = node.splitn(2, ':');
-
-                Some(Self::Database(
+                let server_id = parts.next()?;
+                let server_id = Self::parse_server_uuid(server_id)?;
+                Some(Self::Database(server_id, parts.next()?.to_string()))
+            }
+            "schema" => {
+                let node: &str = parts.next()?;
+                let mut parts = node.splitn(3, ':');
+                let server_id = parts.next()?;
+                let server_id = Self::parse_server_uuid(server_id)?;
+                Some(Self::Schema(
+                    server_id,
                     parts.next()?.to_string(),
                     parts.next()?.to_string(),
                 ))
@@ -43,6 +64,9 @@ impl BrowserTreeId {
         match self {
             Self::Server(id) => format!("server:{}", id),
             Self::Database(server_id, name) => format!("database:{}:{}", server_id, name),
+            Self::Schema(server_id, database, name) => {
+                format!("schema:{}:{}:{}", server_id, database, name)
+            }
         }
     }
 }
@@ -114,13 +138,6 @@ impl BrowserTree {
                 Some(BrowserTreeId::Server(server_id)) => server_id,
                 _ => return Some(Msg::None),
             };
-            let server_id = match Uuid::parse_str(&server_id) {
-                Ok(uuid) => uuid,
-                Err(_) => {
-                    tracing::error!("Could not parse server id: {}", server_id);
-                    return Some(Msg::None);
-                }
-            };
             return Some(Msg::OpenQueryEditor(server_id, database));
         }
         return Some(Msg::None);
@@ -156,6 +173,48 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                 self.set_tree(tree);
                 return Some(Msg::None);
             }
+
+            Event::User(TisqEvent::DbResponse(DbResponse::SchemasListed {
+                server_id,
+                database,
+                schemas,
+            })) => {
+                // tracing::debug!("Schemas listed: {:?}", tables);
+                {
+                    let tree = self.component.tree_mut();
+                    let tree_id = BrowserTreeId::Database(server_id, database.clone()).to_string();
+                    let node = tree.root_mut().query_mut(&tree_id)?;
+                    node.clear();
+                    for schema in schemas {
+                        let id = BrowserTreeId::Schema(server_id, database.clone(), schema.clone())
+                            .to_string();
+                        let mut schema_node = Node::new(id, schema.clone());
+
+                        // dummy is created to make the server node expandable
+                        // it is a workaround for the limitation of the treeview component
+                        // let dummy: Node = Node::new(
+                        //     format!("dummy:{}/{}/{}", server_id, database, table),
+                        //     "loading columns...".to_string(),
+                        // );
+                        // table_node.add_child(dummy);
+
+                        node.add_child(schema_node);
+                    }
+                }
+                // This solution can work as well without blocking, but requires
+                // open access to open_node method as well as new one tree_state_mut
+                let tree_id = BrowserTreeId::Database(server_id, database.clone());
+                let node = self
+                    .component
+                    .tree()
+                    .root()
+                    .query(&tree_id.to_string())?
+                    .clone();
+                let root = self.component.tree().root().clone();
+                self.component.tree_state_mut().open_node(&root, &node);
+
+                return Some(Msg::None);
+            }
             Event::User(TisqEvent::DbResponse(DbResponse::DatabasesListed(
                 server_id,
                 databases,
@@ -163,13 +222,21 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                 // tracing::debug!("Databases listed: {:?}", databases);
                 {
                     let tree = self.component.tree_mut();
-                    let tree_id = BrowserTreeId::Server(server_id.to_string());
+                    let tree_id = BrowserTreeId::Server(server_id);
                     let node = tree.root_mut().query_mut(&tree_id.to_string())?;
                     node.clear();
                     for database in databases {
-                        let id = BrowserTreeId::Database(server_id.to_string(), database.clone())
-                            .to_string();
-                        let database_node = Node::new(id, database);
+                        let id = BrowserTreeId::Database(server_id, database.clone()).to_string();
+                        let mut database_node = Node::new(id, database.clone());
+
+                        // dummy is created to make the server node expandable
+                        // it is a workaround for the limitation of the treeview component
+                        let dummy: Node = Node::new(
+                            format!("dummy:{}/{}", server_id, database),
+                            "loading schemas...".to_string(),
+                        );
+                        database_node.add_child(dummy);
+
                         node.add_child(database_node);
                     }
                 }
@@ -192,7 +259,7 @@ impl Component<Msg, TisqEvent> for BrowserTree {
 
                 // This solution can work as well without blocking, but requires
                 // open access to open_node method as well as new one tree_state_mut
-                let tree_id = BrowserTreeId::Server(server_id.to_string());
+                let tree_id = BrowserTreeId::Server(server_id);
                 let node = self
                     .component
                     .tree()
@@ -233,13 +300,10 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                     // if node is server, open connection
                     State::One(StateValue::String(id)) => match BrowserTreeId::parse_str(&id) {
                         Some(BrowserTreeId::Server(server_id)) => {
-                            match Uuid::parse_str(&server_id) {
-                                Ok(uuid) => return Some(Msg::OpenConnection(uuid)),
-                                Err(_) => {
-                                    tracing::error!("Could not parse server id: {}", server_id);
-                                    return Some(Msg::None);
-                                }
-                            }
+                            return Some(Msg::OpenConnection(server_id))
+                        }
+                        Some(BrowserTreeId::Database(server_id, database)) => {
+                            return Some(Msg::OpenDatabase(server_id, database))
                         }
                         _ => self.perform(Cmd::Custom(TREE_CMD_OPEN)),
                     },

@@ -529,7 +529,6 @@ impl Model {
                     id.clone(),
                     editor.content,
                 )));
-
         }
         self.update_editor_tabs();
         self.activate_first_editor(); // TODO: save and restore last active editor
@@ -717,6 +716,18 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
+                Msg::OpenDatabase(server_id, database) => {
+                    let server = self.storage.get_server(server_id).unwrap().unwrap();
+
+                    self.connection_manager_tx
+                        .send(DbRequest::ListSchemas {
+                            server_id: server.id,
+                            database,
+                        })
+                        .unwrap();
+                    // self.connect_to_database(&server, database);
+                    None
+                }
                 Msg::ReconnectAndExecuteQuery(editor_id, query) => {
                     let server = self
                         .storage
@@ -830,38 +841,11 @@ impl Update<Msg> for Model {
                 Msg::OpenConnection(server_id) => {
                     let server = self.storage.get_server(server_id).unwrap();
                     let server = server.unwrap();
-
-                    // let props = server.connection_properties;
-                    // let connection_url =
-                    //     props.get("url").expect("connection url not found").clone();
-
-                    // self.connection_manager_tx
-                    //     .send(DbRequest::ConnectToServer(server.id, connection_url))
-                    //     .unwrap();
-
                     self.connect_to_server(&server);
-
-                    // let connection: eyre::Result<Connection> =
-                    //     task::block_on(task::spawn(async move {
-                    //         let connection =
-                    //             Connection::connect(server.name, connection_url).await?;
-                    //         Ok(connection)
-                    //     }));
-
-                    // let connection = connection.unwrap();
-                    // self.connections.insert(server_id, connection);
 
                     Some(Msg::LoadDatabases(server_id))
                 }
                 Msg::LoadDatabases(server_id) => {
-                    // let connection = self.connections.get_mut(&server_id).unwrap();
-
-                    // let databases: eyre::Result<Vec<String>> =
-                    //     task::block_on(task::spawn(async move {
-                    //         let databases = connection.list_databases().await?;
-                    //         // Ok(databases)
-                    //         Ok(vec!["test".to_string(), "test2".to_string()])
-                    //     }));
                     self.connection_manager_tx
                         .send(DbRequest::ListDatabases(server_id))
                         .unwrap();

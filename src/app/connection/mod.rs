@@ -60,6 +60,23 @@ impl Connection {
             }
         }
     }
+
+    pub(crate) async fn list_schemas(&mut self) -> Result<Vec<String>, sqlx::Error> {
+        match &mut self.internal {
+            TypedConnection::Postgres(connection) => {
+                let databases = connection
+                    .fetch_all(sqlx::query(
+                        "SELECT schema_name FROM information_schema.schemata;",
+                    ))
+                    .await?;
+                let schemas: Vec<String> = databases
+                    .iter()
+                    .map(|row| row.get::<String, usize>(0))
+                    .collect();
+                Ok(schemas)
+            }
+        }
+    }
 }
 
 #[derive(Hash, PartialEq, Eq)]
@@ -74,6 +91,8 @@ pub(crate) struct ConnectionsManager {
 }
 
 pub(crate) enum DbRequest {
+    ListSchemas { server_id: Uuid, database: String },
+
     ListDatabases(Uuid),
     ConnectToServer(Uuid, String),
     ConnectToDatabase(Uuid, String, String),
@@ -83,6 +102,11 @@ pub(crate) enum DbRequest {
 #[derive(PartialEq, PartialOrd, Clone, Eq, Debug)]
 pub(crate) enum DbResponse {
     DatabasesListed(Uuid, Vec<String>),
+    SchemasListed {
+        server_id: Uuid,
+        database: String,
+        schemas: Vec<String>,
+    },
     Connected(Uuid),
     Executed(Uuid, Vec<String>, Vec<Vec<String>>),
     Error(Uuid, String),
@@ -110,6 +134,27 @@ impl ConnectionsManager {
 
     fn process_request(&mut self, request: DbRequest) -> DbResponse {
         match request {
+            DbRequest::ListSchemas {
+                server_id,
+                database,
+            } => {
+                let key = ConnectionKey {
+                    name: database.to_string(),
+                    server_id,
+                };
+                if let Some(connection) = self.connections.get_mut(&key) {
+                    match task::block_on(connection.list_schemas()) {
+                        Ok(tables) => DbResponse::SchemasListed {
+                            server_id,
+                            database: database.to_string(),
+                            schemas: tables,
+                        },
+                        Err(e) => Self::process_db_error(e, server_id),
+                    }
+                } else {
+                    DbResponse::Error(server_id, "No connection to database".to_string())
+                }
+            }
             DbRequest::ConnectToServer(id, url) => {
                 let key = ConnectionKey {
                     name: DEFAULT_MANAGEMENT_DATABASE.to_string(),

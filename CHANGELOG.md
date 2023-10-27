@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+## Added
+
+- List schemas in database tree view.
+
 ## [v0.1.8] - 2023-10-26
 
 ### Added

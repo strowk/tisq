@@ -54,6 +54,7 @@ pub(crate) enum Msg {
 
     DeleteBrowsedNode(String),
 
+    OpenDatabase(Uuid, String),
     OpenConnection(Uuid),
     LoadDatabases(Uuid),
 

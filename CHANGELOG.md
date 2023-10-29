@@ -8,10 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-WIP
-
-## [0.1.10] - 2023-10-29
-
 ### Changed
 
 - changelog building adjusted.
@@ -113,8 +109,7 @@ WIP
 - Execution results view supporting only successful fetched results.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.10...HEAD
-[0.1.10]: https://github.com/strowk/tisq/compare/v0.1.9...v0.1.10
+[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.9...HEAD
 [0.1.9]: https://github.com/strowk/tisq/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/strowk/tisq/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/strowk/tisq/compare/v0.1.6...v0.1.7

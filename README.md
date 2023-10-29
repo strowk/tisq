@@ -5,7 +5,7 @@ TisQ [tɪz-kjuː] stands for **T**erminal **I**nterface for **S**QL **Q**ueries.
 !["gif recording"](./vhs/base.gif)
 
 Features:
-- Browse servers and databases in tree view.
+- Browse servers, databases, schemas and tables in tree view.
 - Write and execute SQL queries.
 - View query execution results in table.
 - Switch between multiple query tabs with different connections.
@@ -114,8 +114,8 @@ Config section: `result`.
 
 - [x] Customizable keybindings by config TOML file
 - [x] Save query editors content on exit and restore on start
-- [ ] Add other objects to tree view (tables, views, functions, etc)
-- [ ] Add schemas to tree view
+- [x] Add schemas and tables to tree view
+- [ ] Add other objects to tree view (views, functions, etc)
 - [ ] Show table columns in tree view
 - [ ] Add support for query snippets
 - [ ] status line: Show loading while executing query
@@ -131,7 +131,7 @@ Config section: `result`.
 - [ ] Better limit of query result by memory size (use https://docs.rs/datasize/latest/datasize/ )
 - [ ] Syntax highlighting for query editor
 - [ ] databases: Add support for MySQL
-- [ ] databses: Add support for SQLite
+- [ ] databases: Add support for SQLite
 - [ ] databases: Add support for MS SQL Server (via https://github.com/prisma/tiberius )
 - 
 

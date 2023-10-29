@@ -8,9 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Changed
-
-- changelog building adjusted.
+WIP
 
 ## [0.1.9] - 2023-10-29
 

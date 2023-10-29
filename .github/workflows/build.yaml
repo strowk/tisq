@@ -18,9 +18,6 @@ jobs:
             ./target
             ~/.cargo
             ./cross
-      - uses: zattoo/changelog@v1
-        with:
-          token: ${{github.token}}
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
       - run: cargo install cargo-make

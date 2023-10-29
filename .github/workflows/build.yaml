@@ -13,9 +13,7 @@ jobs:
       - name: Lint changelog
         run: |-
           set -e
-          cd changelog
-          npm ci
-          cd -
+          npm ci --prefix changelog
           node changelog/lint.mjs
       - name: Cache
         uses: actions/cache@v3

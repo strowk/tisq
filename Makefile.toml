@@ -6,6 +6,10 @@ CACHE_FROM = { value = "type=local,src=../../docker-cache", condition = { env_no
     "CACHE_FROM",
 ] } }
 
+[tasks.lint-changelog]
+command = "node"
+args = ["./changelog/lint.mjs"]
+
 [tasks.install]
 command = "cargo"
 args = ["install", "--path", "./"]

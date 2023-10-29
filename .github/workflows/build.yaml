@@ -10,11 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - run: |-
+      - name: Lint changelog
+        run: |-
           set -e
           cd changelog
           npm ci
-          node lint.mjs
+          cd -
+          node changelog/lint.mjs
       - name: Cache
         uses: actions/cache@v3
         with:

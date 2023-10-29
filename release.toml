@@ -19,7 +19,7 @@ exactly = 1
 [[pre-release-replacements]]
 file = "CHANGELOG.md"
 search = "<!-- next-header -->"
-replace = "<!-- next-header -->\n\n## [Unreleased]"
+replace = "<!-- next-header -->\n\n## [Unreleased]\n\nWIP"
 exactly = 1
 
 # Replace footer comparison link in CHANGELOG.md

@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "remark": "^15.0.1",
+    "remark-changelog": "^1.2.1",
+    "to-vfile": "^8.0.0",
+    "vfile-reporter": "^8.1.0"
+  },
+  "repository": "https://github.com/strowk/tisq"
+}

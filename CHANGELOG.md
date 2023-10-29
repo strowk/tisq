@@ -1,4 +1,4 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
@@ -6,9 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 <!-- next-header -->
 
-## [Unreleased] - ReleaseDate
+## [Unreleased]
 
-## [v0.1.9] - 2023-10-29
+### Changed
+
+- changelog building adjusted.
+
+## [0.1.9] - 2023-10-29
 
 ### Added
 
@@ -19,14 +23,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Auto reconnect to database if connection is missing after opening restored editor tab.
 
-## [v0.1.8] - 2023-10-26
+## [0.1.8] - 2023-10-26
 
 ### Added
 
 - Close editor tab with Ctrl+W.
 - Save and restore editors tabs content.
 
-## [v0.1.7] - 2023-10-21
+## [0.1.7] - 2023-10-21
 
 ### Added
 
@@ -40,7 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fixed navigating 'left' from query results.
 
-## [v0.1.6] - 2023-10-14
+## [0.1.6] - 2023-10-14
 
 ### Added
 
@@ -51,7 +55,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Process capital letters in query editor.
 
-## [v0.1.5] - 2023-10-11
+## [0.1.5] - 2023-10-11
 
 ### Added
 
@@ -64,13 +68,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fixed failing on nulls in query result.
 
-## [v0.1.4] - 2023-10-11
+## [0.1.4] - 2023-10-11
 
 ### Added
 
 - Supported more postgres types, such as bool, char, smallint, bigint, float4, float8, bytea and similar to them.
 
-## [v0.1.3] - 2023-10-08
+## [0.1.3] - 2023-10-08
 
 ### Added
 
@@ -80,19 +84,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Log everything in debug.log if `--debug` flag is passed.
 - Add Ctrl+Alt+Left and Ctrl+Alt+Right shortcuts to switch between panels (to avoid clashing with VS Code).
 
-## [v0.1.2] - 2023-10-08
+## [0.1.2] - 2023-10-08
 
 ### Added
 
 - New `ctrl+e` shortcut to execute.
 
-## [v0.1.1] - 2023-10-08
+## [0.1.1] - 2023-10-08
 
 ### Added
 
 - `--version` flag to print version.
 
-## [v0.1.0] - 2023-10-08
+## [0.1.0] - 2023-10-08
 
 ### Added
 
@@ -106,13 +110,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 <!-- next-url -->
 [Unreleased]: https://github.com/strowk/tisq/compare/v0.1.9...HEAD
-[v0.1.9]: https://github.com/strowk/tisq/compare/v0.1.8...v0.1.9
-[v0.1.8]: https://github.com/strowk/tisq/compare/v0.1.7...v0.1.8
-[v0.1.7]: https://github.com/strowk/tisq/compare/v0.1.6...v0.1.7
-[v0.1.6]: https://github.com/strowk/tisq/compare/v0.1.5...v0.1.6
-[v0.1.5]: https://github.com/strowk/tisq/compare/v0.1.4...v0.1.5
-[v0.1.4]: https://github.com/strowk/tisq/compare/v0.1.3...v0.1.4
-[v0.1.3]: https://github.com/strowk/tisq/compare/v0.1.2...v0.1.3
-[v0.1.2]: https://github.com/strowk/tisq/compare/v0.1.1...v0.1.2
-[v0.1.1]: https://github.com/strowk/tisq/compare/v0.1.0...v0.1.1
-[v0.1.0]: https://github.com/strowk/tisq/releases/tag/v0.1.0
+[0.1.9]: https://github.com/strowk/tisq/compare/v0.1.8...v0.1.9
+[0.1.8]: https://github.com/strowk/tisq/compare/v0.1.7...v0.1.8
+[0.1.7]: https://github.com/strowk/tisq/compare/v0.1.6...v0.1.7
+[0.1.6]: https://github.com/strowk/tisq/compare/v0.1.5...v0.1.6
+[0.1.5]: https://github.com/strowk/tisq/compare/v0.1.4...v0.1.5
+[0.1.4]: https://github.com/strowk/tisq/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/strowk/tisq/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/strowk/tisq/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/strowk/tisq/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/strowk/tisq/releases/tag/v0.1.0

@@ -29,7 +29,7 @@ DOWNLOAD_URL="$(curl https://api.github.com/repos/strowk/tisq/releases/latest | 
 if [[ -z "$DOWNLOAD_URL" ]]; then
     echo "No prebuilt binary found for $BUILD"
     echo "You might need to build from source"
-    echo "Refer to README in https://github.com/strowk/tisq for more information"
+    echo "Refer to README in https://github.com/strowk/tisq#from-sources for more information"
     exit 1
 fi
 

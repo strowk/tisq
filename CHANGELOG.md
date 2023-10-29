@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased] - ReleaseDate
 
+## [v0.1.9] - 2023-10-29
+
 ## Added
 
 - List schemas in database tree view.
@@ -103,7 +105,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Execution results view supporting only successful fetched results.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.8...HEAD
+[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.9...HEAD
+[v0.1.9]: https://github.com/strowk/tisq/compare/v0.1.8...v0.1.9
 [v0.1.8]: https://github.com/strowk/tisq/compare/v0.1.7...v0.1.8
 [v0.1.7]: https://github.com/strowk/tisq/compare/v0.1.6...v0.1.7
 [v0.1.6]: https://github.com/strowk/tisq/compare/v0.1.5...v0.1.6

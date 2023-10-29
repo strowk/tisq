@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@master
       - name: Lint changelog
         run: |-
+          echo Checking changelog file...
           set -e
           npm ci --prefix changelog
           node changelog/lint.mjs

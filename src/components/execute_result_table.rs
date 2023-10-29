@@ -188,12 +188,17 @@ impl Component<Msg, TisqEvent> for ExecuteResultTable {
                 self.set_result(QueryResult { headers, data }, 0);
                 return Some(Msg::ShowFetchedTable);
             }
-            Event::User(TisqEvent::DbResponse(DbResponse::ConnectionIsDown(id, name, query))) => {
-                // self.set_result(QueryResult { headers, data }, 0);
-                return Some(Msg::ReconnectAndExecuteQuery(
-                    EditorId::new(id, name),
-                    query,
-                ));
+            Event::User(TisqEvent::DbResponse(DbResponse::ConnectionIsDown {
+                original_request,
+                ..
+            })) => {
+                // Event::User(TisqEvent::DbResponse(DbResponse::ConnectionIsDown(id, name, query))) => {
+
+                return Some(Msg::ReconnectAndRepeat(original_request));
+                // return Some(Msg::ReconnectAndExecuteQuery(
+                //     EditorId::new(id, name),
+                //     query,
+                // ));
             }
             // Event::User(TisqEvent::DbResponse(DbResponse::Error(_, data))) => {
             //     return Some(Msg::None);

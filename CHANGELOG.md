@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Added
 
 - List schemas in database tree view.
+- List tables in database tree view.
+
+## Fixed
+
+- Auto reconnect to database if connection is missing after opening restored editor tab.
 
 ## [v0.1.8] - 2023-10-26
 

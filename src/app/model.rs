@@ -705,6 +705,16 @@ impl Model {
             ))
             .unwrap();
     }
+
+    fn reconnect(&mut self, editor_id: &EditorId) {
+        let server = self
+            .storage
+            .get_server(editor_id.server_id)
+            .unwrap()
+            .unwrap(); // TODO: display error properly
+        self.connect_to_server(&server);
+        self.connect_to_database(&server, editor_id.database.clone());
+    }
 }
 
 // Let's implement Update for model
@@ -716,28 +726,84 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
-                Msg::OpenDatabase(server_id, database) => {
+                Msg::OpenSchema { server_id, database, schema, retries } => {
+                    let server = self.storage.get_server(server_id).unwrap().unwrap();
+
+                    self.connection_manager_tx
+                        .send(DbRequest::ListTables {
+                            server_id: server.id,
+                            database,
+                            schema,
+                            retries,
+                        })
+                        .unwrap();
+                    None
+                }
+                Msg::OpenDatabase(server_id, database, retries) => {
                     let server = self.storage.get_server(server_id).unwrap().unwrap();
 
                     self.connection_manager_tx
                         .send(DbRequest::ListSchemas {
                             server_id: server.id,
                             database,
+                            retries,
                         })
                         .unwrap();
                     // self.connect_to_database(&server, database);
                     None
                 }
-                Msg::ReconnectAndExecuteQuery(editor_id, query) => {
-                    let server = self
-                        .storage
-                        .get_server(editor_id.server_id)
-                        .unwrap()
-                        .unwrap(); // TODO: display error properly
-                    self.connect_to_server(&server);
-                    self.connect_to_database(&server, editor_id.database.clone());
-                    Some(Msg::ExecuteQuery(editor_id, query))
+                Msg::ReconnectAndRepeat(original_request) => {
+                    match original_request {
+                        DbRequest::Execute(server_id, database, query, retries) => {
+                            if retries > 3 {
+                                return None;
+                            }
+                            self.reconnect(&EditorId {
+                                server_id,
+                                database: database.clone(),
+                            });
+                            Some(Msg::ExecuteQuery(
+                                EditorId {
+                                    server_id,
+                                    database,
+                                },
+                                query,
+                                retries,
+                            ))
+                        }
+                        DbRequest::ListSchemas {
+                            server_id,
+                            database,
+                            retries,
+                        } => {
+                            if retries > 3 {
+                                return None;
+                            }
+                            self.reconnect(&EditorId {
+                                server_id,
+                                database: database.clone(),
+                            });
+                            Some(Msg::OpenDatabase(server_id, database, retries))
+                        }
+                        // DbRequest::ListTables {
+                        //     server_id,
+                        //     database,
+                        //     schema
+                        // } => Some(Msg::OpenDatabase(server_id, database)),
+                        _ => None,
+                    }
+                    // Some(Msg::ExecuteQuery(editor_id, query))
                 }
+                // Msg::ReconnectAndExecuteQuery(editor_id, query) => {
+                //     let server = self
+                //         .storage
+                //         .get_server(editor_id.server_id)
+                //         .unwrap()
+                //         .unwrap(); // TODO: display error properly
+                //     self.connect_to_server(&server);
+                //     self.connect_to_database(&server, editor_id.database.clone());
+                //     Some(Msg::ExecuteQuery(editor_id, query))
+                // }
                 Msg::CloseTab(editor_id) => {
                     self.query_editors.remove(&editor_id);
                     self.update_editor_tabs();
@@ -954,7 +1020,7 @@ impl Update<Msg> for Model {
                     // self.app.
                     None
                 }
-                Msg::ExecuteQuery(editor_id, query) => {
+                Msg::ExecuteQuery(editor_id, query, retries) => {
                     // let execute_result = execute_query(query);
                     // self.event_dispatcher_port.dispatch(Event::User(
                     //     TisqEvent::QueryResultFetched(QueryResult {
@@ -967,6 +1033,7 @@ impl Update<Msg> for Model {
                             editor_id.server_id,
                             editor_id.database,
                             query,
+                            retries,
                         ))
                         .unwrap();
 

@@ -117,6 +117,7 @@ impl<'a> Editor<'a> {
         Msg::ExecuteQuery(
             self.editor_id.clone(),
             self.get_text().unwrap_or("".to_string()),
+            0,
         )
     }
 }

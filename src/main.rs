@@ -7,7 +7,7 @@ use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Mutex;
 
-use app::EditorId;
+use app::{DbRequest, EditorId};
 use once_cell::sync::Lazy;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -30,8 +30,9 @@ use crate::config::TisqConfig;
 pub(crate) enum Msg {
     AppClose,
 
-    ExecuteQuery(EditorId, String),
-    ReconnectAndExecuteQuery(EditorId, String),
+    ExecuteQuery(EditorId, String, i32),
+    // ReconnectAndExecuteQuery(EditorId, String),
+    ReconnectAndRepeat(DbRequest),
     ChangeFocus(Id),
 
     NavigateRight,
@@ -54,7 +55,13 @@ pub(crate) enum Msg {
 
     DeleteBrowsedNode(String),
 
-    OpenDatabase(Uuid, String),
+    OpenDatabase(Uuid, String, i32),
+    OpenSchema {
+        server_id: Uuid,
+        database: String,
+        schema: String,
+        retries: i32,
+    },
     OpenConnection(Uuid),
     LoadDatabases(Uuid),
 

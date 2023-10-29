@@ -13,6 +13,7 @@ mod keybindings;
 
 pub(crate) use user_event::TisqEvent;
 pub(crate) use connection::DbResponse;
+pub(crate) use connection::DbRequest;
 pub(crate) use model::EditorId;
 pub(crate) use keybindings::KeybindingsConfig;
 pub(crate) use keybindings::SectionKeybindings;

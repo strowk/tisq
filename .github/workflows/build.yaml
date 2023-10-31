@@ -33,6 +33,9 @@ jobs:
       # - run: cargo make test-coverage
       - run: cargo make install-cross
       - run: cargo make build-linux_x86_64
+      - run: cargo make build-linux_arm
+      - run: cargo make build-linux_x86_64_musl
+      - run: cargo make build-linux_arm_musl
       - run: cargo make build-windows_x86_64
       - run: cargo make build-mac_x86_64
         env:
@@ -71,6 +74,9 @@ jobs:
       - run: tar -czf tisq-aarch64-apple-darwin.tar.gz target/aarch64-apple-darwin/release/tisq
       - run: tar -czf tisq-x86_64-apple-darwin.tar.gz target/x86_64-apple-darwin/release/tisq
       - run: tar -czf tisq-x86_64-unknown-linux-gnu.tar.gz target/x86_64-unknown-linux-gnu/release/tisq
+      - run: tar -czf tisq-aarch64-unknown-linux-gnu.tar.gz target/aarch64-unknown-linux-gnu/release/tisq
+      - run: tar -czf tisq-x86_64-unknown-linux-musl.tar.gz target/x86_64-unknown-linux-musl/release/tisq
+      - run: tar -czf tisq-aarch64-unknown-linux-musl.tar.gz target/aarch64-unknown-linux-musl/release/tisq
       - run: tar -czf tisq-x86_64-pc-windows-gnu.tar.gz target/x86_64-pc-windows-gnu/release/tisq.exe
       - name: Create GitHub release
         if: >

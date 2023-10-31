@@ -17,6 +17,7 @@ jobs:
           node changelog/lint.mjs
 
   build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:

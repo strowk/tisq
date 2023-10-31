@@ -52,15 +52,55 @@ args = ["install", "cross", "--git", "https://github.com/cross-rs/cross"]
 [tasks.build-all]
 dependencies = [
     "build-linux_x86_64",
+    "build-linux_arm",
+    "build-linux_x86_64_musl",
+    "build-linux_arm_musl",
     "build-windows_x86_64",
     "build-mac_x86_64",
     "build-mac_arm",
 ]
 
-# Building binary for linux x86_64
+[tasks.build-all-docker]
+dependencies = [
+    "build-docker-linux_arm",
+    "build-docker-linux_x86_64",
+    "build-docker-linux_arm_alpine",
+    "build-docker-linux_x86_64_alpine",
+]
+
+[tasks.build-docker-linux_x86_64]
+command = "docker"
+args = ["build", "--platform", "linux/amd64", "--build-arg", "ARCH=x86_64-unknown-linux-gnu", "-t", "tisq:amd64", "-f", "docker/Dockerfile.debian", "."]
+
+[tasks.build-docker-linux_arm]
+command = "docker"
+args = ["build", "--platform", "linux/arm64", "--build-arg", "ARCH=aarch64-unknown-linux-gnu", "-t", "tisq:arm64", "-f", "docker/Dockerfile.debian", "."]
+
+[tasks.build-docker-linux_x86_64_alpine]
+command = "docker"
+args = ["build", "--platform", "linux/amd64", "--build-arg", "ARCH=x86_64-unknown-linux-musl", "-t", "tisq:amd64-alpine", "-f", "docker/Dockerfile.alpine", "."]
+
+[tasks.build-docker-linux_arm_alpine]
+command = "docker"
+args = ["build", "--platform", "linux/arm64", "--build-arg", "ARCH=aarch64-unknown-linux-musl", "-t", "tisq:arm64-alpine", "-f", "docker/Dockerfile.alpine", "."]
+
+# Building binaries for linux
+
 [tasks.build-linux_x86_64]
 command = "cross"
 args = ["build", "--target", "x86_64-unknown-linux-gnu", "--release"]
+
+[tasks.build-linux_arm]
+command = "cross"
+args = ["build", "--target", "aarch64-unknown-linux-gnu", "--release"]
+
+[tasks.build-linux_x86_64_musl]
+command = "cross"
+args = ["build", "--target", "x86_64-unknown-linux-musl", "--release"]
+
+[tasks.build-linux_arm_musl]
+command = "cross"
+args = ["build", "--target", "aarch64-unknown-linux-musl", "--release"]
 
 # Building binary for windows x86_64
 

@@ -1,0 +1,5 @@
+FROM debian:12-slim
+ARG ARCH=x86_64-unknown-linux-gnu
+COPY target/${ARCH}/release/tisq /usr/local/bin/tisq
+RUN chmod +x /usr/local/bin/tisq
+CMD ["tisq"]

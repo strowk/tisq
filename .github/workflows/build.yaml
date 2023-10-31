@@ -56,11 +56,13 @@ jobs:
             ./cross
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
-      - run: cargo install cargo-make
       # Create target folder beforehand, as otherwise it would be
       # created from container and would not have right user
       - run: mkdir -p ./target
-      - run: cargo make install-cross
+      - run: if ! ( which cargo-make &>/dev/null ) ; then cargo install cargo-make ; fi
+        shell: bash
+      - run: if ! ( which cross &>/dev/null ) ; then cargo make install-cross ; fi
+        shell: bash
       - run: cargo make ${{ matrix.make }}
         env:
           CACHE_TO: type=gha,mode=max,scope=${{ matrix.cache }}

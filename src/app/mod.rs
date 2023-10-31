@@ -10,6 +10,7 @@ mod user_event;
 mod event_dispatcher;
 mod connection;
 mod keybindings;
+mod snippets;
 
 pub(crate) use user_event::TisqEvent;
 pub(crate) use connection::DbResponse;

@@ -133,6 +133,10 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
 
         let res_message = match ev {
             Event::Keyboard(kb_event) => match self.keybindings.get_action(&kb_event) {
+                Some(&TisqKeyboundAction::EditorTryExpand) => Some(Msg::EditorTryExpand(
+                    self.editor_id.clone(),
+                    self.component.get_current_line(),
+                )),
                 Some(&TisqKeyboundAction::EditorNextTab) => Some(Msg::NextEditor),
                 Some(&TisqKeyboundAction::EditorPrevTab) => Some(Msg::PreviousEditor),
                 Some(&TisqKeyboundAction::EditorMoveTabLeft) => {
@@ -187,7 +191,15 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
 
         res_message.or_else(|| {
             match ev {
-                Event::User(TisqEvent::EditorContentReset(editor_id, content)) => {
+                Event::User(TisqEvent::EditorSnippetResolve(editor_id, content)) => {
+                    if self.editor_id != editor_id {
+                        return None;
+                    }
+                    self.perform(Cmd::Custom(TEXTAREA_CMD_DEL_WORD)); // removing snippet
+                    self.component.add_text(&content);
+                    Some(Msg::None)
+                }
+                Event::User(TisqEvent::EditorContentAdd(editor_id, content)) => {
                     // self.component.attr(attr, value)
                     // tracing::debug!("editor content reset for {:?}, check in {:?}", editor_id, self.editor_id);
                     if self.editor_id != editor_id {
@@ -195,7 +207,7 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
                     }
                     self.component.add_text(&content);
                     Some(Msg::None)
-                },
+                }
                 // Event::Keyboard(KeyEvent {
                 //     code: Key::Left | Key::Right,
                 //     kind: KeyEventKind::Press,

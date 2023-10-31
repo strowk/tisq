@@ -12,6 +12,7 @@ use crate::components::{
 use super::config::TisqConfig;
 use super::connection::{self, DbRequest, DbResponse};
 use super::keybindings::{Keybindings, EDITOR_SECTION};
+use super::snippets::{standard_postgres_snippets, Snippet};
 use super::storage::{NewServer, Storage, StoredServer};
 use super::{storage, Id, Msg, SectionKeybindings, TisqEvent, TisqKeyboundAction};
 use ordered_hash_map::OrderedHashMap;
@@ -63,6 +64,8 @@ pub struct Model {
     shown_editor: Option<EditorId>,
     // connection_manager_rx: Receiver<DbResponse>,
     // connections: HashMap<Uuid, Connection>,
+    snippets_library: HashMap<String, Snippet>,
+    showing_snippets: bool,
     execute_result_state: ExecuteResultState,
 
     keybindings: Keybindings<TisqKeyboundAction>,
@@ -139,6 +142,9 @@ impl Model {
             // connection_manager_rx: back_rx,
             // connections: HashMap::new(),
             execute_result_state: ExecuteResultState::FetchedTable,
+
+            showing_snippets: false,
+            snippets_library: standard_postgres_snippets(),
 
             keybindings,
         };
@@ -265,7 +271,7 @@ impl Model {
                 Box::new(Editor::new(id.clone(), keybindings)),
                 vec![
                     Sub::new(
-                        SubEventClause::User(TisqEvent::EditorContentReset(
+                        SubEventClause::User(TisqEvent::EditorContentAdd(
                             id.clone(),
                             "".to_string()
                         )),
@@ -525,7 +531,7 @@ impl Model {
             self.mount_editor(id.clone(), section_keybindings);
 
             self.event_dispatcher_port
-                .dispatch(Event::User(TisqEvent::EditorContentReset(
+                .dispatch(Event::User(TisqEvent::EditorContentAdd(
                     id.clone(),
                     editor.content,
                 )));
@@ -726,7 +732,20 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
-                Msg::OpenSchema { server_id, database, schema, retries } => {
+                Msg::EditorTryExpand(editor_id, query) => {
+                    if let Some(snippet) = self.snippets_library.get(&query) {
+                        self.event_dispatcher_port.dispatch(Event::User(
+                            TisqEvent::EditorSnippetResolve(editor_id, snippet.query.clone()),
+                        ));
+                    }
+                    None
+                }
+                Msg::OpenSchema {
+                    server_id,
+                    database,
+                    schema,
+                    retries,
+                } => {
                     let server = self.storage.get_server(server_id).unwrap().unwrap();
 
                     self.connection_manager_tx
@@ -834,6 +853,13 @@ impl Update<Msg> for Model {
                     Some(&Id::QueryResultTable) => Some(Msg::ChangeFocus(Id::EditorPanel)),
                     _ => None,
                 },
+                // Msg::ApplySnippet => {
+
+                // },
+                // Msg::ShowSnippets => {
+                //     self.showing_snippets = true;
+                //     None
+                // },
                 Msg::ShowErrorResult => {
                     self.execute_result_state = ExecuteResultState::Error;
                     None

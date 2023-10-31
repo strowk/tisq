@@ -70,6 +70,10 @@ pub(crate) enum Msg {
     ShowFetchedTable,
     ShowErrorResult,
 
+    // ShowSnippets,
+
+    EditorTryExpand(EditorId, String),
+
     None,
 }
 

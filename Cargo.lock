@@ -2403,7 +2403,7 @@ dependencies = [
 [[package]]
 name = "tui-realm-textarea"
 version = "1.1.2"
-source = "git+https://github.com/strowk/tui-realm-textarea.git?branch=improvements#1f1645f2db1ab9ba6ed164d420234f943b571b1c"
+source = "git+https://github.com/strowk/tui-realm-textarea.git?branch=improvements#68e06a21765e0f2c93f0a34bd2f1957251b01602"
 dependencies = [
  "cli-clipboard",
  "lazy-regex",

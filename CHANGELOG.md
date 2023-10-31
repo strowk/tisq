@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-WIP
+### Added
+
+- Snippets expansion for standard SQL and some Postgres queries.
 
 ## [0.1.9] - 2023-10-29
 

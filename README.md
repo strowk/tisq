@@ -98,6 +98,7 @@ Config section: `editor`.
 | Ctrl+PageDown                      | Next query editor tab        | `EditorNextTab`    |
 | Ctrl+Alt+Enter / Ctrl+E / Ctrl+R   | Execute query                | `EditorExecute`    |
 | Ctrl+W                             | Close editor tab             | `EditorCloseTab`   |
+| Ctrl+Space                         | Attempt to expand snippet    | `EditorTryExpand`  |
 
 ### Query result
 
@@ -110,14 +111,39 @@ Config section: `result`.
 | Up, Down               | Move selected line pointer  | -                         |
 | PageUp, PageDown       | Move by page                | -                         |
 
+## Snippets
+
+Snippets are small shortcuts that can be expanded into SQL code.
+
+Currently only standard Postgres snippets are supported, but in future it will be possible to add custom snippets.
+
+### Supported snippets
+
+| Snippet | Expansion |
+| --- | --- |
+| `cq` | Current queries |
+| `dl` | Databases sizes |
+| `tl` | Tables sizes |
+| `cl` | Current locks |
+| `sel` | `SELECT * FROM` |
+| `ins` | `INSERT INTO` |
+| `upd` | `UPDATE` |
+| `del` | `DELETE FROM` |
+| `cre` | `CREATE TABLE` |
+| `alt` | `ALTER TABLE` |
+| `dro` | `DROP TABLE` |
+| `trun` | `TRUNCATE TABLE` |
+
 ## Roadmap
 
 - [x] Customizable keybindings by config TOML file
 - [x] Save query editors content on exit and restore on start
 - [x] Add schemas and tables to tree view
+- [x] Add standard postgres snippets expansion
+- [ ] Display available snippets
+- [ ] Allow to add custom snippets
 - [ ] Add other objects to tree view (views, functions, etc)
 - [ ] Show table columns in tree view
-- [ ] Add support for query snippets
 - [ ] status line: Show loading while executing query
 - [ ] Add support for more Postgres types (from https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html )
 - [ ] Error handling: remove all unwrap() calls and anything else that can panic

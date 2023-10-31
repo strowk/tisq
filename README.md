@@ -92,13 +92,14 @@ Config section: `browser`.
 
 Config section: `editor`.
 
-| Default Keybindings                | Description                  | Config name        | 
-| ---                                | ---                          | ---                |
-| Ctrl+PageUp                        | Previous query editor tab    | `EditorPrevTab`    |
-| Ctrl+PageDown                      | Next query editor tab        | `EditorNextTab`    |
-| Ctrl+Alt+Enter / Ctrl+E / Ctrl+R   | Execute query                | `EditorExecute`    |
-| Ctrl+W                             | Close editor tab             | `EditorCloseTab`   |
-| Ctrl+Space                         | Attempt to expand snippet    | `EditorTryExpand`  |
+| Default Keybindings                | Description                  | Config name           | 
+| ---                                | ---                          | ---                   |
+| Ctrl+PageUp                        | Previous query editor tab    | `EditorPrevTab`       |
+| Ctrl+PageDown                      | Next query editor tab        | `EditorNextTab`       |
+| Ctrl+Alt+Enter / Ctrl+E / Ctrl+R   | Execute query                | `EditorExecute`       |
+| Ctrl+W                             | Close editor tab             | `EditorCloseTab`      |
+| Ctrl+Space                         | Attempt to expand snippet    | `EditorTryExpand`     |
+| Ctrl+/                             | Comment or uncomment line    | `EditorToggleComment` |
 
 ### Query result
 

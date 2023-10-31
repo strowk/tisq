@@ -6,8 +6,8 @@ use tuirealm::{
     command::{Cmd, CmdResult, Direction, Position},
     event::{Event, Key, KeyEvent, KeyEventKind, KeyModifiers},
     props::{
-        Alignment, AttrValue, Attribute, BorderSides, BorderType, Borders, Color, Style,
-        TextModifiers,
+        Alignment, AttrValue, Attribute, BorderSides, BorderType, Borders, Color, PropPayload,
+        PropValue, Style, TextModifiers,
     },
     Component, MockComponent, State, StateValue,
 };
@@ -24,6 +24,7 @@ use tui_realm_textarea::{
     TextArea, TEXTAREA_CMD_DEL_NEXT_WORD, TEXTAREA_CMD_DEL_WORD, TEXTAREA_CMD_MOVE_BOTTOM,
     TEXTAREA_CMD_MOVE_TOP, TEXTAREA_CMD_MOVE_WORD_BACK, TEXTAREA_CMD_MOVE_WORD_FORWARD,
     TEXTAREA_CMD_NEWLINE, TEXTAREA_CMD_PASTE, TEXTAREA_CMD_REDO, TEXTAREA_CMD_UNDO,
+    TEXTAREA_CURSOR_POSITION,
 };
 #[cfg(feature = "search")]
 use tui_realm_textarea::{
@@ -124,9 +125,6 @@ impl<'a> Editor<'a> {
 
 impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
     fn on(&mut self, ev: Event<TisqEvent>) -> Option<Msg> {
-        let alt_control: KeyModifiers = KeyModifiers::ALT.bitor(KeyModifiers::CONTROL);
-        let _cntrl_shift: KeyModifiers = KeyModifiers::SHIFT.bitor(KeyModifiers::CONTROL);
-
         if let Event::Keyboard(_) = ev {
             tracing::debug!("matching key {:?}", ev);
         }
@@ -137,6 +135,48 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
                     self.editor_id.clone(),
                     self.component.get_current_line(),
                 )),
+                Some(&TisqKeyboundAction::EditorToggleComment) => {
+                    let current_line = self.component.get_current_line();
+
+                    let (return_to_row, mut return_to_column) = match self
+                        .component
+                        .query(Attribute::Custom(TEXTAREA_CURSOR_POSITION))
+                    {
+                        Some(AttrValue::Payload(PropPayload::Tup2((
+                            PropValue::Usize(row),
+                            PropValue::Usize(column),
+                        )))) => (row, column),
+                        _ => return Some(Msg::None),
+                    };
+                    // tracing::debug!("starting on  {}", column);
+                    self.perform(Cmd::GoTo(Position::Begin));
+
+                    let should_comment = !current_line.starts_with("--");
+
+                    if should_comment {
+                        self.component.add_text("-- ");
+                        self.perform(Cmd::Delete); // add_text would add one extra endline
+                        return_to_column = return_to_column + 3;
+                    } else {
+                        self.perform(Cmd::Cancel);
+                        self.perform(Cmd::Cancel);
+
+                        return_to_column = return_to_column - 2;
+                        if current_line.starts_with("-- ") {
+                            self.perform(Cmd::Cancel);
+                            return_to_column = return_to_column - 1;
+                        }
+                    }
+
+                    self.component.attr(
+                        Attribute::Custom(TEXTAREA_CURSOR_POSITION),
+                        AttrValue::Payload(PropPayload::Tup2((
+                            PropValue::U16(return_to_row.try_into().unwrap()),
+                            PropValue::U16(return_to_column.try_into().unwrap()),
+                        ))),
+                    );
+                    Some(Msg::None)
+                }
                 Some(&TisqKeyboundAction::EditorNextTab) => Some(Msg::NextEditor),
                 Some(&TisqKeyboundAction::EditorPrevTab) => Some(Msg::PreviousEditor),
                 Some(&TisqKeyboundAction::EditorMoveTabLeft) => {

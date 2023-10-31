@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Snippets expansion for standard SQL and some Postgres queries.
+- Toggle line comment with Ctrl+/.
 
 ## [0.1.9] - 2023-10-29
 

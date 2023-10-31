@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-WIP
+### Added
+
+- Builds for Linux arm64 and for musl.
 
 ## [0.1.10] - 2023-10-31
 

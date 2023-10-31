@@ -113,13 +113,6 @@ jobs:
         # shell: bash
       - run: mv *-build/*.tar.gz ./
       - run: test -f tisq-aarch64-apple-darwin.tar.gz
-      # - run: tar -czf tisq-aarch64-apple-darwin.tar.gz target/aarch64-apple-darwin/release/tisq
-      # - run: tar -czf tisq-x86_64-apple-darwin.tar.gz target/x86_64-apple-darwin/release/tisq
-      # - run: tar -czf tisq-x86_64-unknown-linux-gnu.tar.gz target/x86_64-unknown-linux-gnu/release/tisq
-      # - run: tar -czf tisq-aarch64-unknown-linux-gnu.tar.gz target/aarch64-unknown-linux-gnu/release/tisq
-      # - run: tar -czf tisq-x86_64-unknown-linux-musl.tar.gz target/x86_64-unknown-linux-musl/release/tisq
-      # - run: tar -czf tisq-aarch64-unknown-linux-musl.tar.gz target/aarch64-unknown-linux-musl/release/tisq
-      # - run: tar -czf tisq-x86_64-pc-windows-gnu.tar.gz target/x86_64-pc-windows-gnu/release/tisq.exe
       - name: Create GitHub release
         if: >
           github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')

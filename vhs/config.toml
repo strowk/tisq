@@ -1,0 +1,8 @@
+[keybindings.editor]
+EditorToggleComment = [
+    { modifiers = "Ctrl", key = { type = "Char", args = "l" } },
+]
+
+EditorTryExpand = [
+    { modifiers = "Alt", key = { type = "Char", args = "k" } },
+]

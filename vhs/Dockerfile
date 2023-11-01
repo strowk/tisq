@@ -11,9 +11,10 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # This could record on release instead of local build:
 # RUN curl -s https://raw.githubusercontent.com/strowk/tisq/main/install.sh | bash
+RUN apt-get install -y git
 
 COPY ./tisq /usr/local/bin/tisq
 RUN chmod a+x /usr/local/bin/tisq
+COPY --chown=vhs-user:vhs-user config.toml /home/$USERNAME/.tisq/config.toml
 
-RUN apt-get install -y git
 USER $USERNAME

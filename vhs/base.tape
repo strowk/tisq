@@ -101,7 +101,7 @@ Ctrl+e
 
 Sleep 4
 
-Ctrl+l
+Ctrl+n
 Sleep 1
 
 Down
@@ -116,7 +116,7 @@ Sleep 0.5
 PageDown
 Sleep 3
 
-Ctrl+l
+Ctrl+n
 Sleep 1
 
 Up
@@ -129,5 +129,44 @@ Type "select datname, oid, encoding, datallowconn from pg_catalog.pg_database;"
 Sleep 2
 
 Ctrl+e
-Sleep 5
+Sleep 3
+
+Ctrl+l
+Sleep 1
+
+Enter
+Type "ds"
+Sleep 2
+
+Alt+k
+Sleep 2
+
+Ctrl+e
+Sleep 7
+
+
+Ctrl+n
+Sleep 1
+
+Ctrl+n
+Sleep 1
+
+Down
+Sleep 1
+
+Right
+Sleep 1
+
+Down
+Sleep 0.5
+
+Down
+Sleep 0.5
+
+Down
+Sleep 0.5
+
+Right
+Sleep 10
+
 

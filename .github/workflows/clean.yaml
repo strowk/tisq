@@ -3,8 +3,7 @@ on:
 
 permissions:
   contents: write
-  packages: write
-  packages: read
+  packages: read|write
 
 jobs:
   docker-untagged-clean:

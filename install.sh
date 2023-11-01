@@ -15,6 +15,13 @@ elif [[ "$OSTYPE" == "win32" ]]; then
     THESYSTEMIS="pc-windows-gnu"
 fi
 
+if [[ "$THESYSTEMIS" == "unknown-linux-gnu" ]]; then
+    libc=$(ldd /bin/ls | grep 'musl' | head -1 | cut -d ' ' -f1)
+    if ! [ -z $libc ]; then
+        THESYSTEMIS="unknown-linux-musl"
+    fi
+fi
+
 if [[ "$THESYSTEMIS" == "pc-windows-gnu" ]]; then
     POSTFIX=".exe"
 fi
@@ -44,12 +51,19 @@ INSTALL_TARGET="/usr/local/bin/tisq"
 
 chmod +x "${INSTALL_SOURCE}"
 
+SUDO_PREFIX="sudo"
+
 if [[ "$THESYSTEMIS" == "pc-windows-gnu" ]]; then
     mkdir -p /usr/local/bin
-    mv "${INSTALL_SOURCE}" "${INSTALL_TARGET}${POSTFIX}"
-else 
-    sudo mv "${INSTALL_SOURCE}" "${INSTALL_TARGET}${POSTFIX}"
+    SUDO_PREFIX=""
 fi
+
+# if set environment variable NO_SUDO, then don't use sudo
+if [[ "$NO_SUDO" == "1" ]]; then
+    SUDO_PREFIX=""
+fi
+
+${SUDO_PREFIX} mv "${INSTALL_SOURCE}" "${INSTALL_TARGET}${POSTFIX}"
 
 rm tisq-install/ -r
 rm tisq-archive.tgz

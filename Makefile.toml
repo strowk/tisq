@@ -22,7 +22,6 @@ script = """
 cp ../target/x86_64-unknown-linux-gnu/release/tisq ./tisq
 exec docker build -t vhs-tisq .
 exec docker run --rm --privileged --network tisq -v ${CARGO_MAKE_WORKING_DIRECTORY}:/vhs vhs-tisq ./base.tape
-rmdir storage
 """
 
 [tasks.test-coverage]

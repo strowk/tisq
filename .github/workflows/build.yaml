@@ -81,8 +81,7 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.docker_platform }}
-          push: true
-          registry: ghcr.io
+          # push: true
           file: docker/Dockerfile.${{ matrix.docker_base }}
           # tags: ghcr.io/strowk/tisq:${{ steps.cargo-version.outputs.CARGO_BUILD_VERSION }}
           outputs: type=image,name=ghcr.io/strowk/tisq,push-by-digest=true,name-canonical=true,push=true

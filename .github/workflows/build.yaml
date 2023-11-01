@@ -103,11 +103,13 @@ jobs:
           build-args: |
             TARGET=${{ matrix.target }}
       - name: Export digest
+        if: matrix.docker_platform != null
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build-docker.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"
       - name: Upload digest
+        if: matrix.docker_platform != null
         uses: actions/upload-artifact@v3
         with:
           name: digests-${{ matrix.docker_base }}

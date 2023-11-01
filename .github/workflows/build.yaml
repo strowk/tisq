@@ -26,8 +26,9 @@ jobs:
             token: ${{ secrets.GITHUB_TOKEN }}
             repository_owner: ${{ github.repository_owner }}
             repository: strowk/tisq
+            package_name: tisq
             untagged_only: true
-            owner_type: org # or user
+            owner_type: user
             except_untagged_multiplatform: true
 
   build:

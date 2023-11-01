@@ -20,10 +20,15 @@ jobs:
   remove-untagged:
     runs-on: ubuntu-latest
     steps:
-      - uses: camargo/delete-untagged-action@v1
+      - name: Delete all containers from repository without tags
+        uses: Chizkiyahu/delete-untagged-ghcr-action@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: strowk/tisq
+            token: ${{ secrets.GITHUB_TOKEN }}
+            repository_owner: ${{ github.repository_owner }}
+            repository: strowk/tisq
+            untagged_only: true
+            owner_type: org # or user
+            except_untagged_multiplatform: true
 
   build:
     needs: remove-untagged

@@ -162,7 +162,7 @@ impl KeyboundAction for TisqKeyboundAction {
 
             &TisqKeyboundAction::GlobalCycleNavigation => {
                 vec![KeybindingKeyPress {
-                    key: Key::Char('l'),
+                    key: Key::Char('n'),
                     modifiers: KeyModifiers::CONTROL,
                 }]
             }

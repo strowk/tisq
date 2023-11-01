@@ -3,7 +3,7 @@ on:
 
 permissions:
   contents: write
-  packages: read|write
+  packages: write
 
 jobs:
   docker-untagged-clean:
@@ -22,4 +22,4 @@ jobs:
             repository_owner: ${{ github.repository_owner }}
             repository: ${{ github.repository }}
             untagged_only: true
-            owner_type: user
+            owner_type: org

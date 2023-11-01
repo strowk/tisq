@@ -75,12 +75,18 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/strowk/tisq
       - name: Build and push by digest
         id: build-docker
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: ${{ matrix.docker_platform }}
+          labels: ${{ steps.meta.outputs.labels }}
           # push: true
           file: docker/Dockerfile.${{ matrix.docker_base }}
           # tags: ghcr.io/strowk/tisq:${{ steps.cargo-version.outputs.CARGO_BUILD_VERSION }}

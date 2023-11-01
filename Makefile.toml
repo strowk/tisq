@@ -68,6 +68,13 @@ dependencies = [
     "build-docker-linux_x86_64_alpine",
 ]
 
+[tasks.get-version-for-github]
+command = "bash"
+args = [
+    "-c",
+    "echo CARGO_BUILD_VERSION=${CARGO_MAKE_PROJECT_VERSION} >> $GITHUB_OUTPUT"
+]
+
 [tasks.build-docker-linux_x86_64]
 command = "docker"
 args = ["build", "--platform", "linux/amd64", "--build-arg", "ARCH=x86_64-unknown-linux-gnu", "-t", "tisq:amd64", "-f", "docker/Dockerfile.debian", "."]

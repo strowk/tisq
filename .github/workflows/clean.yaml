@@ -1,0 +1,25 @@
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  docker-untagged-clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Delete all containers from repository without tags
+        uses: Chizkiyahu/delete-untagged-ghcr-action@v3
+        with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            repository_owner: ${{ github.repository_owner }}
+            repository: ${{ github.repository }}
+            untagged_only: true
+            owner_type: user

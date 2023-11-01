@@ -32,6 +32,17 @@ curl -s https://raw.githubusercontent.com/strowk/tisq/main/install.sh | bash
 
 Tested on Linux bash and Windows Git Bash. Should work for MacOS too.
 
+#### Disabling sudo
+
+By default the script would try to install TisQ to `/usr/local/bin` and would require sudo rights for that, 
+but you can disable this behavior by setting `NO_SUDO` environment variable:
+
+```bash
+curl -s https://raw.githubusercontent.com/strowk/tisq/main/install.sh | NO_SUDO=1 bash
+```
+
+Sudo is disabled by default for Windows Git Bash.
+
 ### From sources
 
 If your system/architecture is not supported by the script above, 
@@ -41,6 +52,19 @@ you can install Rust and install TisQ from sources:
 git clone https://github.com/strowk/tisq
 cargo install --path ./tisq
 ```
+
+### Using Docker
+
+You can run TisQ in Docker container:
+
+```bash
+docker run -it --rm ghcr.io/strowk/tisq:main-debian
+# or
+docker run -it --rm ghcr.io/strowk/tisq:main-alpine
+```
+
+Note that the version in `main-*` tags would be from the latest commit in `main` branch.
+Builds are provided based on Debian and Alpine Linux with x86_64 and aarch64 architectures.
 
 ## Keybindings
 

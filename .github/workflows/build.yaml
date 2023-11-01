@@ -145,7 +145,7 @@ jobs:
             $(printf 'ghcr.io/strowk/tisq@sha256:%s ' *)          
       - name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}          
+          docker buildx imagetools inspect ghcr.io/strowk/tisq:${{ steps.meta.outputs.version }}          
 
   publish:
     name: publish

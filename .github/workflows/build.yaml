@@ -79,10 +79,10 @@ jobs:
           platforms: ${{ matrix.docker_platform }}
           push: true
           registry: ghcr.io
-          tags: "ghcr.io/tisq:${{ steps.cargo-version.outputs.CARGO_BUILD_VERSION }}-"
+          tags: "ghcr.io/tisq:${{ steps.cargo-version.outputs.CARGO_BUILD_VERSION }}"
           file: docker/Dockerfile.${{ matrix.docker_base }}
-          build-args:
-            - TARGET=${{ matrix.target }}
+          build-args: |
+            TARGET=${{ matrix.target }}
       - run: |-
           shopt -s extglob
           tar -czf tisq-${{ matrix.target }}.tar.gz target/${{ matrix.target }}/release/tisq?(.exe)

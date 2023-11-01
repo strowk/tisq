@@ -147,8 +147,8 @@ Currently only standard Postgres snippets are supported, but in future it will b
 | Snippet | Expansion |
 | --- | --- |
 | `cq` | Current queries |
-| `dl` | Databases sizes |
-| `tl` | Tables sizes |
+| `ds` | Databases sizes |
+| `ts` | Tables sizes |
 | `cl` | Current locks |
 | `sel` | `SELECT * FROM` |
 | `ins` | `INSERT INTO` |

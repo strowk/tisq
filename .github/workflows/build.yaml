@@ -81,6 +81,8 @@ jobs:
           registry: ghcr.io
           tags: "ghcr.io/tisq:${{ steps.cargo-version.outputs.CARGO_BUILD_VERSION }}-"
           file: docker/Dockerfile.${{ matrix.docker_base }}
+          build-args:
+            - TARGET=${{ matrix.target }}
       - run: |-
           shopt -s extglob
           tar -czf tisq-${{ matrix.target }}.tar.gz target/${{ matrix.target }}/release/tisq?(.exe)
@@ -96,6 +98,7 @@ jobs:
           name: ${{ matrix.target }}-build-archive
           path: tisq-${{ matrix.target }}.tar.gz
           retention-days: 1
+
   publish:
     name: publish
     runs-on: ubuntu-latest

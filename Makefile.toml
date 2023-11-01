@@ -77,19 +77,19 @@ args = [
 
 [tasks.build-docker-linux_x86_64]
 command = "docker"
-args = ["build", "--platform", "linux/amd64", "--build-arg", "ARCH=x86_64-unknown-linux-gnu", "-t", "tisq:amd64", "-f", "docker/Dockerfile.debian", "."]
+args = ["build", "--platform", "linux/amd64", "--build-arg", "TARGET=x86_64-unknown-linux-gnu", "-t", "tisq:amd64", "-f", "docker/Dockerfile.debian", "."]
 
 [tasks.build-docker-linux_arm]
 command = "docker"
-args = ["build", "--platform", "linux/arm64", "--build-arg", "ARCH=aarch64-unknown-linux-gnu", "-t", "tisq:arm64", "-f", "docker/Dockerfile.debian", "."]
+args = ["build", "--platform", "linux/arm64", "--build-arg", "TARGET=aarch64-unknown-linux-gnu", "-t", "tisq:arm64", "-f", "docker/Dockerfile.debian", "."]
 
 [tasks.build-docker-linux_x86_64_alpine]
 command = "docker"
-args = ["build", "--platform", "linux/amd64", "--build-arg", "ARCH=x86_64-unknown-linux-musl", "-t", "tisq:amd64-alpine", "-f", "docker/Dockerfile.alpine", "."]
+args = ["build", "--platform", "linux/amd64", "--build-arg", "TARGET=x86_64-unknown-linux-musl", "-t", "tisq:amd64-alpine", "-f", "docker/Dockerfile.alpine", "."]
 
 [tasks.build-docker-linux_arm_alpine]
 command = "docker"
-args = ["build", "--platform", "linux/arm64", "--build-arg", "ARCH=aarch64-unknown-linux-musl", "-t", "tisq:arm64-alpine", "-f", "docker/Dockerfile.alpine", "."]
+args = ["build", "--platform", "linux/arm64", "--build-arg", "TARGET=aarch64-unknown-linux-musl", "-t", "tisq:arm64-alpine", "-f", "docker/Dockerfile.alpine", "."]
 
 # Building binaries for linux
 

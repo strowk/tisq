@@ -1,5 +1,5 @@
 FROM alpine:3.18
-ARG ARCH=x86_64-unknown-linux-gnu
-COPY target/${ARCH}/release/tisq /usr/local/bin/tisq
+ARG TARGET=x86_64-unknown-linux-gnu
+COPY target/${TARGET}/release/tisq /usr/local/bin/tisq
 RUN chmod +x /usr/local/bin/tisq
 CMD ["tisq"]

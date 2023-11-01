@@ -75,7 +75,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
+      - name: Build and push by digest
+        id: build-docker
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -90,13 +91,13 @@ jobs:
       - name: Export digest
         run: |
           mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
+          digest="${{ steps.build-docker.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"
       - name: Upload digest
         uses: actions/upload-artifact@v3
         with:
           name: digests
-          path: /tmp/digests/
+          path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
       - run: |-

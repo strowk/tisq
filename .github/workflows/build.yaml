@@ -23,20 +23,20 @@ jobs:
         include:
           - make: build-linux_x86_64
             target: x86_64-unknown-linux-gnu
-          - make: build-linux_arm
-            target: aarch64-unknown-linux-gnu
+          # - make: build-linux_arm
+          #   target: aarch64-unknown-linux-gnu
           - make: build-linux_x86_64_musl
             target: x86_64-unknown-linux-musl
-          - make: build-linux_arm_musl
-            target: aarch64-unknown-linux-musl
-          - make: build-windows_x86_64
-            target: x86_64-pc-windows-gnu
-          - make: build-mac_x86_64
-            target: x86_64-apple-darwin
-            cache: mac_x86_64
-          - make: build-mac_arm
-            target: aarch64-apple-darwin
-            cache: mac_arm
+          # - make: build-linux_arm_musl
+          #   target: aarch64-unknown-linux-musl
+          # - make: build-windows_x86_64
+          #   target: x86_64-pc-windows-gnu
+          # - make: build-mac_x86_64
+          #   target: x86_64-apple-darwin
+          #   cache: mac_x86_64
+          # - make: build-mac_arm
+          #   target: aarch64-apple-darwin
+          #   cache: mac_arm
     steps:
       - uses: actions/checkout@master
       - name: Cache

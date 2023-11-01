@@ -79,7 +79,7 @@ jobs:
           platforms: ${{ matrix.docker_platform }}
           push: true
           registry: ghcr.io
-          tags: "ghcr.io/tisq/tisq:${{ steps.cargo-version.outputs.CARGO_BUILD_VERSION }}"
+          tags: "ghcr.io/strowk/tisq:${{ steps.cargo-version.outputs.CARGO_BUILD_VERSION }}"
           file: docker/Dockerfile.${{ matrix.docker_base }}
           build-args: |
             TARGET=${{ matrix.target }}

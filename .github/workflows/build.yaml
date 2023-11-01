@@ -152,14 +152,6 @@ jobs:
       - name: Inspect image
         run: |
           docker buildx imagetools inspect ghcr.io/strowk/tisq:${{ steps.meta.outputs.version }}
-      - name: Delete all containers from repository without tags
-        uses: Chizkiyahu/delete-untagged-ghcr-action@v3
-        with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            repository_owner: ${{ github.repository_owner }}
-            repository: ${{ github.repository }}
-            untagged_only: true
-            owner_type: user
 
   publish:
     name: publish

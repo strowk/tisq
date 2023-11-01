@@ -1,9 +1,10 @@
 on:
-  workflow_dispatch:
+  push:
 
 permissions:
   contents: write
   packages: write
+  packages: read
 
 jobs:
   docker-untagged-clean:

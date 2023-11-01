@@ -23,10 +23,14 @@ jobs:
         include:
           - make: build-linux_x86_64
             target: x86_64-unknown-linux-gnu
+            docker_platform: linux/amd64
+            docker_base: debian
           # - make: build-linux_arm
           #   target: aarch64-unknown-linux-gnu
           - make: build-linux_x86_64_musl
             target: x86_64-unknown-linux-musl
+            docker_platform: linux/amd64
+            docker_base: alpine
           # - make: build-linux_arm_musl
           #   target: aarch64-unknown-linux-musl
           # - make: build-windows_x86_64
@@ -62,24 +66,36 @@ jobs:
           CACHE_FROM: type=gha,scope=${{ matrix.cache }}
       - id: cargo-version
         run: cargo make get-version-for-github
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: ${{ matrix.docker_platform }}
+          push: true
+          registry: ghcr.io
+          tags: "ghcr.io/tisq:${{ steps.cargo-version.outputs.CARGO_BUILD_VERSION }}-"
+          file: docker/Dockerfile.${{ matrix.docker_base }}
       - run: |-
           shopt -s extglob
           tar -czf tisq-${{ matrix.target }}.tar.gz target/${{ matrix.target }}/release/tisq?(.exe)
-      - name: Upload build archive
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.target }}-build-target
-          path: tisq-${{ matrix.target }}.tar.gz
-          retention-days: 1
+      # - name: Upload build archive
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ${{ matrix.target }}-build-target
+      #     path: tisq-${{ matrix.target }}.tar.gz
+      #     retention-days: 1
       - name: Upload build archive
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.target }}-build-archive
           path: tisq-${{ matrix.target }}.tar.gz
           retention-days: 1
-    outputs:
-      CARGO_BUILD_VERSION: ${{ steps.cargo-version.outputs.CARGO_BUILD_VERSION }}
-
   publish:
     name: publish
     runs-on: ubuntu-latest
@@ -126,24 +142,24 @@ jobs:
           files: |
             tisq-*.tar.gz
     
-  docker:
-    runs-on: ubuntu-latest
-    needs: [ build, validate ]
-    steps:
-      - uses: actions/checkout@master
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v3
-      - run: echo version is $ {{ jobs.build.outputs.CARGO_BUILD_VERSION }}
-      - run: |
-          mkdir -p target
-          mv *-build-target/target/*/ ./target
-          ls
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  # docker:
+  #   runs-on: ubuntu-latest
+  #   needs: [ build, validate ]
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - name: Download all workflow run artifacts
+  #       uses: actions/download-artifact@v3
+  #     - run: echo version is ${{ jobs.build.outputs.CARGO_BUILD_VERSION }}
+  #     - run: |
+  #         mkdir -p target
+  #         mv *-build-target/target/*/ ./target
+  #         ls
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
       # - name: Build and push
       #   uses: docker/build-push-action@v5
       #   with:
@@ -151,5 +167,5 @@ jobs:
       #     platforms: linux/amd64
       #     push: true
       #     registry: ghcr.io
-      #     tags: "ghcr.io/tisq:"
+      #     tags: "ghcr.io/tisq:{{ jobs.build.outputs.CARGO_BUILD_VERSION }}-"
     

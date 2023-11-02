@@ -1,15 +1,9 @@
 extern crate tuirealm;
 
-use std::env;
-use std::fs::File;
-use std::path::PathBuf;
-use std::sync::atomic::AtomicBool;
-use std::sync::mpsc::{self, Receiver, Sender};
-use std::sync::Mutex;
-
-use crate::{app, files, DEBUG_LOG, LOG_FILE, FILES_ROOT, QUIT_CHANNEL};
+use crate::app;
+use crate::statics::*;
 use app::{DbRequest, EditorId};
-use once_cell::sync::Lazy;
+
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{fmt, EnvFilter};

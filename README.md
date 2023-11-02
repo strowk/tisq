@@ -5,6 +5,7 @@ TisQ [tɪz-kjuː] stands for **T**erminal **I**nterface for **S**QL **Q**ueries.
 !["gif recording"](./vhs/base.gif)
 
 Features:
+
 - Browse servers, databases, schemas and tables in tree view.
 - Write and execute SQL queries.
 - View query execution results in table.
@@ -34,7 +35,7 @@ Tested on Linux bash and Windows Git Bash. Should work for MacOS too.
 
 #### Disabling sudo
 
-By default the script would try to install TisQ to `/usr/local/bin` and would require sudo rights for that, 
+By default the script would try to install TisQ to `/usr/local/bin` and would require sudo rights for that,
 but you can disable this behavior by setting `NO_SUDO` environment variable:
 
 ```bash
@@ -45,7 +46,7 @@ Sudo is disabled by default for Windows Git Bash.
 
 ### From sources
 
-If your system/architecture is not supported by the script above, 
+If your system/architecture is not supported by the script above,
 you can install Rust and install TisQ from sources:
 
 ```bash
@@ -67,10 +68,12 @@ Note that the version in `main-*` tags would be from the latest commit in `main`
 Builds are provided based on Debian and Alpine Linux with x86_64 and aarch64 architectures.
 
 Under certain conditions commands above might fail like this:
-> thread 'main' panicked at 'Cannot initialize terminal: CannotConnectStdout'. 
-This seems to be an issue in docker, which does not prepare tty properly before starting the process.
 
+> thread 'main' panicked at 'Cannot initialize terminal: CannotConnectStdout'.
+
+This seems to be an issue in docker, which does not prepare tty properly before starting the process.
 To bypass this issue you can add a small delay like this:
+
 ```bash
 docker run -ti --rm --entrypoint sh ghcr.io/strowk/tisq:main-alpine -c 'sleep 1; exec tisq'
 ```
@@ -79,7 +82,7 @@ This issue was only noticed with Alpine so far.
 
 ## Keybindings
 
-Some of following keybindings are configurable and could be adjusted in configuration 
+Some of following keybindings are configurable and could be adjusted in configuration
 file that is located under home folder in `.tisq/config.toml`.
 
 The format for this file could be illustrated by the following example:
@@ -103,8 +106,8 @@ using simple `type = "Esc"` and how characters are specified using `type = "Char
 
 Config section: `globals`.
 
-| Default Keybindings        | Description    | Config name           | 
-| ---                        | ---            | ---                   |
+| Default Keybindings        | Description    | Config name           |
+| -------------------------- | -------------- | --------------------- |
 | Ctrl+c                     | Quit           | `GlobalExit`          |
 | Esc                        | Cancel or quit | `GlobalCancel`        |
 | Alt+Left / Ctrl+Alt+Left   | Navigate Left  | `GlobalNavigateLeft`  |
@@ -119,37 +122,37 @@ In case if no such operation is in progress, it would serve as a quit command.
 
 Config section: `browser`.
 
-| Default Keybindings  | Description                              | Config name                       | 
-| ---                  | ---                                      | ---                               |
-| a                    | Add new server                           | `BrowserAddServer`                |
-| Delete               | Delete server                            | -                                 |
-| q                    | Open query editor for selected database  | `BrowserDatabaseOpenQueryEditor`  |
-| Up, Down             | Navigate                                 | -                                 |
-| Right, Left          | Open,close node                          | -                                 |
+| Default Keybindings | Description                             | Config name                      |
+| ------------------- | --------------------------------------- | -------------------------------- |
+| a                   | Add new server                          | `BrowserAddServer`               |
+| Delete              | Delete server                           | -                                |
+| q                   | Open query editor for selected database | `BrowserDatabaseOpenQueryEditor` |
+| Up, Down            | Navigate                                | -                                |
+| Right, Left         | Open,close node                         | -                                |
 
 ### Query editor
 
 Config section: `editor`.
 
-| Default Keybindings                | Description                  | Config name           | 
-| ---                                | ---                          | ---                   |
-| Ctrl+PageUp                        | Previous query editor tab    | `EditorPrevTab`       |
-| Ctrl+PageDown                      | Next query editor tab        | `EditorNextTab`       |
-| Ctrl+Alt+Enter / Ctrl+E / Ctrl+R   | Execute query                | `EditorExecute`       |
-| Ctrl+W                             | Close editor tab             | `EditorCloseTab`      |
-| Ctrl+Space                         | Attempt to expand snippet    | `EditorTryExpand`     |
-| Ctrl+/                             | Comment or uncomment line    | `EditorToggleComment` |
+| Default Keybindings              | Description               | Config name           |
+| -------------------------------- | ------------------------- | --------------------- |
+| Ctrl+PageUp                      | Previous query editor tab | `EditorPrevTab`       |
+| Ctrl+PageDown                    | Next query editor tab     | `EditorNextTab`       |
+| Ctrl+Alt+Enter / Ctrl+E / Ctrl+R | Execute query             | `EditorExecute`       |
+| Ctrl+W                           | Close editor tab          | `EditorCloseTab`      |
+| Ctrl+Space                       | Attempt to expand snippet | `EditorTryExpand`     |
+| Ctrl+/                           | Comment or uncomment line | `EditorToggleComment` |
 
 ### Query result
 
 Config section: `result`.
 
-| Default Keybindings    | Description                 | Config name               | 
-| ---                    | ---                         | ---                       |
-| Ctrl+Left              | Scroll columns to left      | `ResultOffsetColumnLeft`  |
-| Ctrl+Right             | Scroll columns to right     | `ResultOffsetColumnRight` |
-| Up, Down               | Move selected line pointer  | -                         |
-| PageUp, PageDown       | Move by page                | -                         |
+| Default Keybindings | Description                | Config name               |
+| ------------------- | -------------------------- | ------------------------- |
+| Ctrl+Left           | Scroll columns to left     | `ResultOffsetColumnLeft`  |
+| Ctrl+Right          | Scroll columns to right    | `ResultOffsetColumnRight` |
+| Up, Down            | Move selected line pointer | -                         |
+| PageUp, PageDown    | Move by page               | -                         |
 
 ## Snippets
 
@@ -157,26 +160,26 @@ Snippets are small shortcuts that can be expanded into SQL code.
 
 Currently only standard Postgres snippets are supported, but in future it will be possible to add custom snippets.
 
-You can enter snippet shortcut and press `Ctrl+Space` to attempt to expand it. 
+You can enter snippet shortcut and press `Ctrl+Space` to attempt to expand it.
 In case if no snippets matched, you will see a table with available snippets to choose from.
 Then you can use `Enter` key to aplly selected snippet or use `GlobalCancel` (defaults to `Esc`) to cancel selection of snippet.
 
 ### Supported snippets
 
-| Shortcut | Expansion |
-| --- | --- |
-| `cq` | Current queries |
-| `ds` | Databases sizes |
-| `ts` | Tables sizes |
-| `cl` | Current locks |
-| `sel` | `SELECT * FROM` |
-| `ins` | `INSERT INTO` |
-| `upd` | `UPDATE` |
-| `del` | `DELETE FROM` |
-| `cre` | `CREATE TABLE` |
-| `alt` | `ALTER TABLE` |
-| `dro` | `DROP TABLE` |
-| `trun` | `TRUNCATE TABLE` |
+| Shortcut | Expansion        |
+| -------- | ---------------- |
+| `cq`     | Current queries  |
+| `ds`     | Databases sizes  |
+| `ts`     | Tables sizes     |
+| `cl`     | Current locks    |
+| `sel`    | `SELECT * FROM`  |
+| `ins`    | `INSERT INTO`    |
+| `upd`    | `UPDATE`         |
+| `del`    | `DELETE FROM`    |
+| `cre`    | `CREATE TABLE`   |
+| `alt`    | `ALTER TABLE`    |
+| `dro`    | `DROP TABLE`     |
+| `trun`   | `TRUNCATE TABLE` |
 
 ## Subcommands
 
@@ -221,5 +224,4 @@ tisq server add [name] [connection-url]
 - [ ] databases: Add support for MySQL
 - [ ] databases: Add support for SQLite
 - [ ] databases: Add support for MS SQL Server (via https://github.com/prisma/tiberius )
-- 
-
+-

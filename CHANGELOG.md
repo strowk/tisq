@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+WIP
+
+## [0.1.12] - 2023-11-02
+
 ### Added
 
 - Command `server add` to add server from command line.
@@ -127,7 +131,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Execution results view supporting only successful fetched results.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.11...HEAD
+[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.12...HEAD
+[0.1.12]: https://github.com/strowk/tisq/compare/v0.1.11...v0.1.12
 [0.1.11]: https://github.com/strowk/tisq/compare/v0.1.10...v0.1.11
 [0.1.10]: https://github.com/strowk/tisq/compare/v0.1.9...v0.1.10
 [0.1.9]: https://github.com/strowk/tisq/compare/v0.1.8...v0.1.9

@@ -10,7 +10,6 @@ jobs:
   # Clean up all left-over docker images after tags have been moved to new builds
   remove-untagged:
     runs-on: ubuntu-latest
-    needs: docker-merge
     steps:
       - name: Delete all images from repository without tags
         uses: Chizkiyahu/delete-untagged-ghcr-action@v3

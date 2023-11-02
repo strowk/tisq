@@ -16,6 +16,7 @@ jobs:
         run: |-
           echo Checking changelog file...
           set -e
+          npm ci --prefix changelog
           node changelog/lint.mjs
 
   remove-untagged:

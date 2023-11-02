@@ -161,12 +161,12 @@ Currently only standard Postgres snippets are supported, but in future it will b
 
 ## Subcommands
 
-### `tisq add-server`
+### `tisq server add`
 
 Add new server to the list of servers.
 
 ```bash
-tisq add-server [name] [connection-url]
+tisq server add [name] [connection-url]
 ```
 
 ## Roadmap

@@ -180,9 +180,17 @@ Then you can use `Enter` key to aplly selected snippet or use `GlobalCancel` (de
 
 ## Subcommands
 
+### `tisq --version`
+
+Show version of TisQ and exit.
+
+### `tisq --help`
+
+Show help message and exit.
+
 ### `tisq server add`
 
-Add new server to the list of servers.
+Add new server to the list of servers in storage under `~/.tisq`.
 
 ```bash
 tisq server add [name] [connection-url]

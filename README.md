@@ -66,6 +66,17 @@ docker run -it --rm ghcr.io/strowk/tisq:main-alpine
 Note that the version in `main-*` tags would be from the latest commit in `main` branch.
 Builds are provided based on Debian and Alpine Linux with x86_64 and aarch64 architectures.
 
+Under certain conditions commands above might fail like this:
+> thread 'main' panicked at 'Cannot initialize terminal: CannotConnectStdout'. 
+This seems to be an issue in docker, which does not prepare tty properly before starting the process.
+
+To bypass this issue you can add a small delay like this:
+```bash
+docker run -ti --rm --entrypoint sh ghcr.io/strowk/tisq:main-alpine -c 'sleep 1; exec tisq'
+```
+
+This issue was only noticed with Alpine so far.
+
 ## Keybindings
 
 Some of following keybindings are configurable and could be adjusted in configuration 

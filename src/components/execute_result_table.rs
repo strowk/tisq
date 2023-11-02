@@ -2,17 +2,15 @@ use tui_realm_stdlib::Table;
 use tuirealm::command::{Cmd, CmdResult, Direction, Position};
 use tuirealm::event::{KeyEventKind, KeyModifiers};
 use tuirealm::props::{
-    Alignment, BorderSides, BorderType, Borders, Color, PropPayload, PropValue, TableBuilder,
-    TextSpan,
+    Alignment, BorderSides, Borders, Color, PropPayload, PropValue, TableBuilder, TextSpan,
 };
 use tuirealm::{
     event::{Key, KeyEvent},
     Component, Event, MockComponent,
 };
 use tuirealm::{AttrValue, Attribute};
-// tui
 
-use crate::app::{DbResponse, EditorId, SectionKeybindings, TisqEvent, TisqKeyboundAction};
+use crate::app::{DbResponse, SectionKeybindings, TisqEvent, TisqKeyboundAction};
 use crate::Msg;
 
 #[derive(PartialEq, PartialOrd, Clone, Eq, Debug)]

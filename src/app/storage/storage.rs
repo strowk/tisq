@@ -1,8 +1,4 @@
-use std::{
-    collections::HashMap,
-    env, fs,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashMap, fs, path::PathBuf};
 
 use super::id::Id;
 use kv::*;

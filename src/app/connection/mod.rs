@@ -1,12 +1,10 @@
 use std::{
     collections::HashMap,
     sync::mpsc::{Receiver, Sender},
-    vec,
 };
 
 use async_std::task;
 
-use kv::Key;
 use sqlx::{
     postgres::{PgArguments, PgConnectOptions},
     Arguments, Column, Connection as SqlxConnection, Executor, PgConnection, Row,

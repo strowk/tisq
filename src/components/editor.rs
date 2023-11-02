@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::ops::BitOr;
+
 #[cfg(feature = "search")]
 use tuirealm::StateValue;
 use tuirealm::{
@@ -33,7 +33,7 @@ use tui_realm_textarea::{
 
 use crate::{
     app::{EditorId, SectionKeybindings, TisqEvent, TisqKeyboundAction},
-    Id, Msg,
+    Msg,
 };
 
 pub struct Editor<'a> {

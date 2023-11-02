@@ -1,19 +1,9 @@
-use core::fmt;
-use std::{collections::HashMap, hash::Hash, vec};
+use std::{hash::Hash, vec};
 
-use itertools::Itertools;
-use serde::{
-    de::{self, Visitor},
-    Deserialize, Deserializer, Serialize, Serializer,
-};
-use tuirealm::{
-    event::{Key, KeyEvent, KeyEventKind, KeyModifiers},
-    AttrValue, Attribute, State, Sub, SubClause, SubEventClause,
-};
+use serde::{Deserialize, Serialize};
+use tuirealm::event::{Key, KeyModifiers};
 
-use crate::{config::TisqConfig, Id};
-
-use super::{KeybindingKeyPress, KeyboundAction, TisqEvent};
+use super::{KeybindingKeyPress, KeyboundAction};
 
 #[derive(Deserialize, Serialize, PartialEq, Eq, Hash, Clone, Debug)]
 pub(crate) enum TisqKeyboundAction {
@@ -52,7 +42,12 @@ pub(crate) const QUERY_RESULT_SECTION: &str = "result";
 
 impl KeyboundAction for TisqKeyboundAction {
     fn sections() -> Vec<&'static str> {
-        vec![GLOBAL_SECTION, EDITOR_SECTION, BROWSER_SECTION, QUERY_RESULT_SECTION]
+        vec![
+            GLOBAL_SECTION,
+            EDITOR_SECTION,
+            BROWSER_SECTION,
+            QUERY_RESULT_SECTION,
+        ]
     }
 
     fn list(section: &str) -> Vec<&TisqKeyboundAction> {

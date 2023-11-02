@@ -211,7 +211,7 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                             table.clone(),
                         )
                         .to_string();
-                        let mut table_node = Node::new(id, table.clone());
+                        let table_node = Node::new(id, table.clone());
 
                         // dummy is created to make the table node expandable
                         // it is a workaround for the limitation of the treeview component

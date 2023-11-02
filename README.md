@@ -159,6 +159,16 @@ Currently only standard Postgres snippets are supported, but in future it will b
 | `dro` | `DROP TABLE` |
 | `trun` | `TRUNCATE TABLE` |
 
+## Subcommands
+
+### `tisq add-server`
+
+Add new server to the list of servers.
+
+```bash
+tisq add-server [name] [connection-url]
+```
+
 ## Roadmap
 
 - [x] Customizable keybindings by config TOML file

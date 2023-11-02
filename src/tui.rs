@@ -7,7 +7,7 @@ use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Mutex;
 
-use crate::{app, files};
+use crate::{app, files, DEBUG_LOG, LOG_FILE, FILES_ROOT, QUIT_CHANNEL};
 use app::{DbRequest, EditorId};
 use once_cell::sync::Lazy;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
@@ -96,34 +96,10 @@ pub enum Id {
     ExecuteErrorResult,
 }
 
-static QUIT_CHANNEL: Lazy<Mutex<(Sender<String>, Receiver<String>)>> =
-    Lazy::new(|| Mutex::new(mpsc::channel()));
-
-static DEBUG_LOG: AtomicBool = AtomicBool::new(false);
-
 pub(crate) fn run(debug_logs: bool) -> eyre::Result<()> {
     if debug_logs {
         DEBUG_LOG.store(true, std::sync::atomic::Ordering::Relaxed);
     }
-
-    static FILES_ROOT: Lazy<eyre::Result<PathBuf>> = Lazy::new(|| files::open_tisq_root());
-
-    static LOG_FILE: Lazy<Option<File>> = Lazy::new(|| {
-        File::create(if DEBUG_LOG.load(std::sync::atomic::Ordering::Relaxed) {
-            FILES_ROOT.as_ref().unwrap().join("tisq-debug.log")
-        } else {
-            FILES_ROOT.as_ref().unwrap().join("tisq-errors.log")
-        })
-        .map_err(|_| {
-            QUIT_CHANNEL
-                .lock()
-                .unwrap()
-                .0
-                .send("Failed to create log file `tisq.log` - exited abnormally.".to_string())
-                .unwrap();
-        })
-        .ok()
-    });
 
     let tracing_to_file = tracing_subscriber::registry().with(
         fmt::layer()

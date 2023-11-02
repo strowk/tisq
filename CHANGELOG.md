@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-WIP
+### Added
+
+- Command `add-server` to add server from command line.
 
 ## [0.1.11] - 2023-10-31
 

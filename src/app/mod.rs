@@ -12,6 +12,8 @@ mod connection;
 mod keybindings;
 mod snippets;
 
+pub(crate) mod cmd;
+
 pub(crate) use user_event::TisqEvent;
 pub(crate) use connection::DbResponse;
 pub(crate) use connection::DbRequest;

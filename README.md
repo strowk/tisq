@@ -202,7 +202,7 @@ tisq server add [name] [connection-url]
 - [x] Save query editors content on exit and restore on start
 - [x] Add schemas and tables to tree view
 - [x] Add standard postgres snippets expansion
-- [ ] Display available snippets
+- [x] Display available snippets to choose from
 - [ ] Allow to add custom snippets
 - [ ] Add other objects to tree view (views, functions, etc)
 - [ ] Show table columns in tree view

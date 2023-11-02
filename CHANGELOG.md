@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Command `server add` to add server from command line.
+- If no snippet is found in line, then show list of snippets to choose from.
+
+### Changed
+
+- Esc now is bound to `GlobalCancel` instead of `GlobalExit`.
 
 ## [0.1.11] - 2023-10-31
 

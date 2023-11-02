@@ -131,10 +131,11 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
 
         let res_message = match ev {
             Event::Keyboard(kb_event) => match self.keybindings.get_action(&kb_event) {
-                Some(&TisqKeyboundAction::EditorTryExpand) => Some(Msg::EditorTryExpand(
-                    self.editor_id.clone(),
-                    self.component.get_current_line(),
-                )),
+                Some(&TisqKeyboundAction::EditorTryExpand) => Some(Msg::EditorTryExpand {
+                    editor_id: self.editor_id.clone(),
+                    text: self.component.get_current_line(),
+                    remove_input: true,
+                }),
                 Some(&TisqKeyboundAction::EditorToggleComment) => {
                     let current_line = self.component.get_current_line();
 
@@ -231,11 +232,17 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
 
         res_message.or_else(|| {
             match ev {
-                Event::User(TisqEvent::EditorSnippetResolve(editor_id, content)) => {
+                Event::User(TisqEvent::EditorSnippetResolve {
+                    editor_id,
+                    content,
+                    remove_input,
+                }) => {
                     if self.editor_id != editor_id {
                         return None;
                     }
-                    self.perform(Cmd::Custom(TEXTAREA_CMD_DEL_WORD)); // removing snippet
+                    if remove_input {
+                        self.perform(Cmd::Custom(TEXTAREA_CMD_DEL_WORD)); // removing entered snippet
+                    }
                     self.component.add_text(&content);
                     Some(Msg::None)
                 }

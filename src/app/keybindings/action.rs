@@ -13,6 +13,7 @@ pub(crate) enum TisqKeyboundAction {
     GlobalNavigateRight,
     GlobalNavigateUp,
     GlobalNavigateDown,
+    GlobalCancel,
 
     EditorNextTab,
     EditorPrevTab,
@@ -59,6 +60,7 @@ impl KeyboundAction for TisqKeyboundAction {
                 &TisqKeyboundAction::GlobalNavigateRight,
                 &TisqKeyboundAction::GlobalNavigateUp,
                 &TisqKeyboundAction::GlobalNavigateDown,
+                &TisqKeyboundAction::GlobalCancel,
             ],
             EDITOR_SECTION => vec![
                 &TisqKeyboundAction::EditorNextTab,
@@ -91,16 +93,17 @@ impl KeyboundAction for TisqKeyboundAction {
     fn get_default_bindings(&self) -> Vec<KeybindingKeyPress> {
         match self {
             &TisqKeyboundAction::GlobalExit => {
-                vec![
-                    KeybindingKeyPress {
-                        key: Key::Esc,
-                        modifiers: KeyModifiers::NONE,
-                    },
-                    KeybindingKeyPress {
-                        key: Key::Char('c'),
-                        modifiers: KeyModifiers::CONTROL,
-                    },
-                ]
+                vec![KeybindingKeyPress {
+                    key: Key::Char('c'),
+                    modifiers: KeyModifiers::CONTROL,
+                }]
+            }
+
+            &TisqKeyboundAction::GlobalCancel => {
+                vec![KeybindingKeyPress {
+                    key: Key::Esc,
+                    modifiers: KeyModifiers::NONE,
+                }]
             }
 
             &TisqKeyboundAction::GlobalNavigateDown => {

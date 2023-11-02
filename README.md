@@ -94,11 +94,15 @@ Config section: `globals`.
 
 | Default Keybindings        | Description    | Config name           | 
 | ---                        | ---            | ---                   |
-| Ctrl+c, Esc                | Quit           | `GlobalExit`          |
+| Ctrl+c                     | Quit           | `GlobalExit`          |
+| Esc                        | Cancel or quit | `GlobalCancel`        |
 | Alt+Left / Ctrl+Alt+Left   | Navigate Left  | `GlobalNavigateLeft`  |
 | Alt+Right / Ctrl+Alt+Right | Navigate Right | `GlobalNavigateRight` |
 | Alt+Up / Ctrl+Alt+Up       | Navigate Up    | `GlobalNavigateUp`    |
 | Alt+Down / Ctrl+Alt+Down   | Navigate Down  | `GlobalNavigateDown`  |
+
+`GlobalCancel` is used to cancel some of operations, such as applying snippet.
+In case if no such operation is in progress, it would serve as a quit command.
 
 ### Browser (tree view)
 
@@ -142,9 +146,13 @@ Snippets are small shortcuts that can be expanded into SQL code.
 
 Currently only standard Postgres snippets are supported, but in future it will be possible to add custom snippets.
 
+You can enter snippet shortcut and press `Ctrl+Space` to attempt to expand it. 
+In case if no snippets matched, you will see a table with available snippets to choose from.
+Then you can use `Enter` key to aplly selected snippet or use `GlobalCancel` (defaults to `Esc`) to cancel selection of snippet.
+
 ### Supported snippets
 
-| Snippet | Expansion |
+| Shortcut | Expansion |
 | --- | --- |
 | `cq` | Current queries |
 | `ds` | Databases sizes |

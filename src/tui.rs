@@ -31,6 +31,8 @@ pub(crate) enum Msg {
     NavigateUp,
     NavigateDown,
 
+    Cancel,
+
     PreviousEditor,
     NextEditor,
     MoveTabLeft(EditorId),
@@ -61,8 +63,13 @@ pub(crate) enum Msg {
     ShowFetchedTable,
     ShowErrorResult,
 
-    // ShowSnippets,
-    EditorTryExpand(EditorId, String),
+    ApplySnippet(String),
+    ShowSnippets,
+    EditorTryExpand {
+        editor_id: EditorId,
+        text: String,
+        remove_input: bool,
+    },
 
     None,
 }
@@ -78,6 +85,7 @@ pub enum Id {
     Editor(EditorId),
     Tree,
     GlobalListener,
+    SnippetsTable,
 
     EditorTabs,
     QueryResultTable,

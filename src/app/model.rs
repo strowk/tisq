@@ -6,13 +6,13 @@ use crate::app::event_dispatcher::EventDispatcherPort;
 use crate::app::keybindings::{BROWSER_SECTION, GLOBAL_SECTION, QUERY_RESULT_SECTION};
 use crate::components::{
     AddServerForm, BrowserTree, Editor, EditorTabs, ErrorResult, ExecuteResultTable,
-    FormSubmitListener, GlobalListener, InputText, SentTree, ACTIVE_TAB_INDEX,
+    FormSubmitListener, GlobalListener, InputText, SentTree, SnippetsTable, ACTIVE_TAB_INDEX,
 };
 
 use super::config::TisqConfig;
 use super::connection::{self, DbRequest, DbResponse};
 use super::keybindings::{Keybindings, EDITOR_SECTION};
-use super::snippets::{standard_postgres_snippets, Snippet};
+use super::snippets::{self, standard_postgres_snippets, Snippet};
 use super::storage::{NewServer, Storage, StoredServer};
 use super::{storage, Id, Msg, SectionKeybindings, TisqEvent, TisqKeyboundAction};
 use ordered_hash_map::OrderedHashMap;
@@ -209,12 +209,16 @@ impl Model {
                     if let Some(id) = active_editor_id {
                         self.app.view(&id, f, chunks[1]);
                     }
-                    match self.execute_result_state {
-                        ExecuteResultState::Error => {
-                            self.app.view(&Id::ExecuteErrorResult, f, chunks[2]);
-                        }
-                        ExecuteResultState::FetchedTable => {
-                            self.app.view(&Id::QueryResultTable, f, chunks[2]);
+                    if self.showing_snippets {
+                        self.app.view(&Id::SnippetsTable, f, chunks[2]);
+                    } else {
+                        match self.execute_result_state {
+                            ExecuteResultState::Error => {
+                                self.app.view(&Id::ExecuteErrorResult, f, chunks[2]);
+                            }
+                            ExecuteResultState::FetchedTable => {
+                                self.app.view(&Id::QueryResultTable, f, chunks[2]);
+                            }
                         }
                     }
                 }
@@ -261,6 +265,18 @@ impl Model {
             }
         }
         node
+    }
+
+    fn mount_snippets_table(&mut self) {
+        let snippets = self.snippets_library.values().collect();
+        assert!(self
+            .app
+            .mount(
+                Id::SnippetsTable,
+                Box::new(SnippetsTable::new(snippets)),
+                vec![]
+            )
+            .is_ok());
     }
 
     fn mount_editor(&mut self, id: EditorId, keybindings: SectionKeybindings<TisqKeyboundAction>) {
@@ -732,13 +748,52 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
-                Msg::EditorTryExpand(editor_id, query) => {
-                    if let Some(snippet) = self.snippets_library.get(&query) {
-                        self.event_dispatcher_port.dispatch(Event::User(
-                            TisqEvent::EditorSnippetResolve(editor_id, snippet.query.clone()),
-                        ));
+                Msg::Cancel => {
+                    if self.showing_snippets {
+                        self.showing_snippets = false;
+                        self.app.umount(&Id::SnippetsTable).unwrap();
+                        None
+                    } else if self.adding_server {
+                        // TODO: cancel adding server
+                        None
+                    } else {
+                        Some(Msg::AppClose)
                     }
-                    None
+                }
+                Msg::ApplySnippet(snortcut) => {
+                    if let Some(editor_id) = &self.shown_editor {
+                        if self.showing_snippets {
+                            self.showing_snippets = false;
+                            self.app.active(&Id::Editor(editor_id.clone())).unwrap();
+                            self.app.umount(&Id::SnippetsTable).unwrap();
+                        }
+                        Some(Msg::EditorTryExpand {
+                            editor_id: editor_id.clone(),
+                            text: snortcut,
+                            remove_input: false,
+                        })
+                    } else {
+                        None
+                    }
+                }
+                Msg::EditorTryExpand {
+                    editor_id,
+                    text,
+                    remove_input,
+                } => {
+                    tracing::debug!("trying to expand text: {}", text);
+                    if let Some(snippet) = self.snippets_library.get(&text) {
+                        self.event_dispatcher_port.dispatch(Event::User(
+                            TisqEvent::EditorSnippetResolve {
+                                editor_id,
+                                content: snippet.query.clone(),
+                                remove_input,
+                            },
+                        ));
+                        None
+                    } else {
+                        Some(Msg::ShowSnippets)
+                    }
                 }
                 Msg::OpenSchema {
                     server_id,
@@ -856,10 +911,14 @@ impl Update<Msg> for Model {
                 // Msg::ApplySnippet => {
 
                 // },
-                // Msg::ShowSnippets => {
-                //     self.showing_snippets = true;
-                //     None
-                // },
+                Msg::ShowSnippets => {
+                    if !self.showing_snippets {
+                        self.showing_snippets = true;
+                        self.mount_snippets_table();
+                        self.app.active(&Id::SnippetsTable).unwrap();
+                    }
+                    None
+                }
                 Msg::ShowErrorResult => {
                     self.execute_result_state = ExecuteResultState::Error;
                     None

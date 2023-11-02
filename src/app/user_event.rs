@@ -7,7 +7,11 @@ pub(crate) enum TisqEvent {
     TreeReloaded(SentTree),
     DbResponse(DbResponse),
     EditorContentAdd(EditorId, String), // TODO: use attr instead of UserEvent
-    EditorSnippetResolve(EditorId, String), // TODO: use attr instead of UserEvent
+    EditorSnippetResolve {
+        editor_id: EditorId,
+        content: String,
+        remove_input: bool,
+    }, // TODO: use attr instead of UserEvent
 }
 
 // For the purposes of subscriptions we only care about the type of the event
@@ -18,7 +22,18 @@ impl PartialEq for TisqEvent {
             (Self::TreeReloaded(_), Self::TreeReloaded(_)) => true,
             (Self::DbResponse(_), Self::DbResponse(_)) => true,
             (Self::EditorContentAdd(_, _), Self::EditorContentAdd(_, _)) => true,
-            (Self::EditorSnippetResolve(_, _), Self::EditorSnippetResolve(_, _)) => true,
+            (
+                Self::EditorSnippetResolve {
+                    editor_id: _,
+                    content: _,
+                    remove_input: _,
+                },
+                Self::EditorSnippetResolve {
+                    editor_id: _,
+                    content: _,
+                    remove_input: _,
+                },
+            ) => true,
             _ => false,
         }
     }

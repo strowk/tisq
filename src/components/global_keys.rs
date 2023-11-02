@@ -48,6 +48,7 @@ impl Component<Msg, TisqEvent> for GlobalListener {
                     | &TisqKeyboundAction::GlobalNavigateDown),
                 ) => Self::switch_location_nav(action),
                 Some(&TisqKeyboundAction::GlobalCycleNavigation) => Some(Msg::CycleNavigation),
+                Some(&TisqKeyboundAction::GlobalCancel) => Some(Msg::Cancel),
                 _ => None,
                 // None => None,
             },

@@ -20,5 +20,19 @@ pub(crate) struct CliArgs {
 #[derive(FromArgs, PartialEq, Debug)]
 #[argh(subcommand)]
 pub(crate) enum Subcommands {
+    Servers(Servers),
+}
+
+#[derive(FromArgs, PartialEq, Debug)]
+/// Subcommand to manage servers
+#[argh(subcommand, name = "server")]
+pub(crate) struct Servers {
+    #[argh(subcommand)]
+    pub subcommands: ServerSubcommands,
+}
+
+#[derive(FromArgs, PartialEq, Debug)]
+#[argh(subcommand)]
+pub(crate) enum ServerSubcommands {
     AddServer(AddServerArgs),
 }

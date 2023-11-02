@@ -20,7 +20,7 @@ pub(crate) fn run(add_server_args: AddServerArgs, files_root: &PathBuf) -> eyre:
 
 #[derive(FromArgs, PartialEq, Debug)]
 /// Add a server to storage
-#[argh(subcommand, name = "add-server")]
+#[argh(subcommand, name = "add")]
 pub(crate) struct AddServerArgs {
     #[argh(positional)]
     /// name of the server

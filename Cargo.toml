@@ -8,6 +8,7 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+argh = "0.1.12"
 # tuirealm = { version = "1.9.0", features = [ "termion" ]} 
 # tuirealm = "1.9.0"
 # tuirealm = { git = 'https://github.com/strowk/tui-realm.git', branch = "issue-54-fix", features = [ "derive", "ratatui", "crossterm" ] }

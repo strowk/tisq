@@ -6,7 +6,15 @@ CACHE_FROM = { value = "type=local,src=../../docker-cache", condition = { env_no
     "CACHE_FROM",
 ] } }
 
+[tasks.install-changelog-lint-deps]
+script_runner = "@shell"
+cwd = "changelog"
+script = '''
+npm ci
+'''
+
 [tasks.lint-changelog]
+dependencies = ["install-changelog-lint-deps"]
 command = "node"
 args = ["./changelog/lint.mjs"]
 

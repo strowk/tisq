@@ -164,22 +164,6 @@ jobs:
         run: |
           docker buildx imagetools inspect ghcr.io/strowk/tisq:main-${{ matrix.docker_base }}
 
-  # Clean up all left-over docker images after tags have been moved to new builds
-  remove-untagged:
-    runs-on: ubuntu-latest
-    needs: docker-merge
-    steps:
-      - name: Delete all images from repository without tags
-        uses: Chizkiyahu/delete-untagged-ghcr-action@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository_owner: ${{ github.repository_owner }}
-          repository: strowk/tisq
-          package_name: tisq
-          untagged_only: true
-          owner_type: user
-          except_untagged_multiplatform: true
-
   publish:
     name: publish
     runs-on: ubuntu-latest

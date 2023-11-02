@@ -1,29 +1,24 @@
 on:
+  schedule:
+    - cron:  '5 4 * * *'
   workflow_dispatch:
 
 permissions:
-  contents: write
   packages: write
 
 jobs:
-  docker-untagged-clean:
+  # Clean up all left-over docker images after tags have been moved to new builds
+  remove-untagged:
     runs-on: ubuntu-latest
+    needs: docker-merge
     steps:
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Delete all images from repository without tags
+        uses: Chizkiyahu/delete-untagged-ghcr-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: camargo/delete-untagged-action@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository_owner: ${{ github.repository_owner }}
           repository: strowk/tisq
-      # - name: Delete all containers from repository without tags
-      #   uses: Chizkiyahu/delete-untagged-ghcr-action@v3
-      #   with:
-      #       token: ${{ secrets.GITHUB_TOKEN }}
-      #       repository_owner: ${{ github.repository_owner }}
-      #       repository: ${{ github.repository }}
-      #       untagged_only: true
-      #       owner_type: org
+          package_name: tisq
+          untagged_only: true
+          owner_type: user
+          except_untagged_multiplatform: true

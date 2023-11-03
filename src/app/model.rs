@@ -4,15 +4,18 @@
 
 use crate::app::event_dispatcher::EventDispatcherPort;
 use crate::app::keybindings::{BROWSER_SECTION, GLOBAL_SECTION, QUERY_RESULT_SECTION};
+use crate::app::spinner_ticking_port::SpinnerTickingPort;
 use crate::components::{
-    AddServerForm, BrowserTree, Editor, EditorTabs, ErrorResult, ExecuteResultTable,
-    FormSubmitListener, GlobalListener, InputText, SentTree, SnippetsTable, ACTIVE_TAB_INDEX,
+    AddServerForm, BrowserTree, DbResponseStatusListener, Editor, EditorTabs, ErrorResult,
+    ExecuteResultTable, FormSubmitListener, GlobalListener, InputText, SentTree, SnippetsTable,
+    ACTIVE_TAB_INDEX,
 };
 
 use super::config::TisqConfig;
 use super::connection::{self, DbRequest, DbResponse};
 use super::keybindings::{Keybindings, EDITOR_SECTION};
 use super::snippets::{self, standard_postgres_snippets, Snippet};
+use super::status::AppStatus;
 use super::storage::{NewServer, Storage, StoredServer};
 use super::{storage, Id, Msg, SectionKeybindings, TisqEvent, TisqKeyboundAction};
 use ordered_hash_map::OrderedHashMap;
@@ -69,6 +72,9 @@ pub struct Model {
     execute_result_state: ExecuteResultState,
 
     keybindings: Keybindings<TisqKeyboundAction>,
+    spinner_ticking: SpinnerTickingPort,
+
+    pub(crate) app_status: AppStatus,
 }
 
 #[derive(PartialEq, PartialOrd, Eq, Hash, Debug, Clone)]
@@ -121,8 +127,15 @@ impl Model {
 
         let keybindings = Keybindings::new(&config.keybindings.unwrap_or_default());
 
-        let mut app = Self {
-            app: Self::init_app(&keybindings, &storage, Box::new(event_dispatcher.clone())),
+        let spinner_ticking = SpinnerTickingPort::new();
+
+        let mut model = Self {
+            app: Self::init_app(
+                &keybindings,
+                &storage,
+                Box::new(event_dispatcher.clone()),
+                Box::new(spinner_ticking.clone()),
+            ),
             quit: false,
             redraw: true,
             terminal: TerminalBridge::new().expect("Cannot initialize terminal"),
@@ -147,9 +160,13 @@ impl Model {
             snippets_library: standard_postgres_snippets(),
 
             keybindings,
+            spinner_ticking,
+
+            app_status: AppStatus::default(),
         };
-        app.restore_editors();
-        app
+        model.restore_editors();
+        AppStatus::mount(&mut model.app);
+        model
     }
 
     pub fn view(&mut self) {
@@ -159,13 +176,28 @@ impl Model {
             .terminal
             .raw_mut()
             .draw(|f| {
+                let content_and_status = Layout::default()
+                    .direction(Direction::Vertical)
+                    .margin(1)
+                    .constraints(
+                        [
+                            Constraint::Min(0),    // Content
+                            Constraint::Length(1), // Status line
+                        ]
+                        .as_ref(),
+                    )
+                    .split(f.size());
+                let content = content_and_status[0];
+                let status_line = content_and_status[1];
+                self.app_status.view(status_line, f, &mut self.app);
+
                 let sides = Layout::default()
                     .direction(Direction::Horizontal)
                     .constraints(vec![
                         Constraint::Length(50),
                         Constraint::Min(0), // fills remaining space
                     ])
-                    .split(f.size());
+                    .split(content);
 
                 let left = sides[0];
                 let right = sides[1];
@@ -395,6 +427,7 @@ impl Model {
         keybindings: &Keybindings<TisqKeyboundAction>,
         storage: &storage::Storage,
         event_dispatcher: Box<EventDispatcherPort<TisqEvent>>,
+        spinner_ticking: Box<SpinnerTickingPort>,
     ) -> TisqApplication {
         // Setup application
         // NOTE: NoUserEvent is a shorthand to tell tui-realm we're not going to use any custom user event
@@ -405,6 +438,7 @@ impl Model {
             EventListenerCfg::default()
                 .default_input_listener(Duration::from_millis(20))
                 .port(event_dispatcher, Duration::from_millis(100))
+                .port(spinner_ticking, Duration::from_millis(400))
                 .poll_timeout(Duration::from_millis(10))
                 .tick_interval(Duration::from_secs(1)),
         );
@@ -507,10 +541,17 @@ impl Model {
                 vec![FormSubmitListener::get_subscription()]
             )
             .is_ok());
-        // Active letter counter
-        // assert!(app.active(&Id::LetterCounter).is_ok());
-        // assert!(app.active(&Id::Editor).is_ok());
+
+        assert!(app
+            .mount(
+                Id::DbResponseStatusListener,
+                Box::new(DbResponseStatusListener::new()),
+                DbResponseStatusListener::subscriptions()
+            )
+            .is_ok());
+
         assert!(app.active(&Id::Tree).is_ok());
+
         app
     }
 
@@ -702,14 +743,20 @@ impl Model {
         }
     }
 
+    fn send_db_request(&mut self, db_request: DbRequest) -> eyre::Result<()> {
+        self.app_status
+            .push_db_request(&db_request, &mut self.spinner_ticking);
+        self.connection_manager_tx.send(db_request)?;
+        Ok(())
+    }
+
     fn connect_to_server(&mut self, server: &StoredServer) {
         let connection_url = server
             .connection_properties
             .get("url")
             .expect("connection url not found")
             .clone();
-        self.connection_manager_tx
-            .send(DbRequest::ConnectToServer(server.id, connection_url))
+        self.send_db_request(DbRequest::ConnectToServer(server.id, connection_url))
             .unwrap();
     }
 
@@ -719,13 +766,12 @@ impl Model {
             .get("url")
             .expect("connection url not found")
             .clone();
-        self.connection_manager_tx
-            .send(DbRequest::ConnectToDatabase(
-                server.id,
-                database,
-                connection_url,
-            ))
-            .unwrap();
+        self.send_db_request(DbRequest::ConnectToDatabase(
+            server.id,
+            database,
+            connection_url,
+        ))
+        .unwrap();
     }
 
     fn reconnect(&mut self, editor_id: &EditorId) {
@@ -739,8 +785,6 @@ impl Model {
     }
 }
 
-// Let's implement Update for model
-
 impl Update<Msg> for Model {
     fn update(&mut self, msg: Option<Msg>) -> Option<Msg> {
         if let Some(msg) = msg {
@@ -748,6 +792,11 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
+                Msg::PopDbRequestStatus => {
+                    self.app_status.pop_db_request(&mut self.spinner_ticking);
+                    None
+                }
+                Msg::TriggerRedraw => None, // this message does nothing except to trigger a redraw, which all messages do
                 Msg::Cancel => {
                     if self.showing_snippets {
                         self.showing_snippets = false;
@@ -803,26 +852,24 @@ impl Update<Msg> for Model {
                 } => {
                     let server = self.storage.get_server(server_id).unwrap().unwrap();
 
-                    self.connection_manager_tx
-                        .send(DbRequest::ListTables {
-                            server_id: server.id,
-                            database,
-                            schema,
-                            retries,
-                        })
-                        .unwrap();
+                    self.send_db_request(DbRequest::ListTables {
+                        server_id: server.id,
+                        database,
+                        schema,
+                        retries,
+                    })
+                    .unwrap();
                     None
                 }
                 Msg::OpenDatabase(server_id, database, retries) => {
                     let server = self.storage.get_server(server_id).unwrap().unwrap();
 
-                    self.connection_manager_tx
-                        .send(DbRequest::ListSchemas {
-                            server_id: server.id,
-                            database,
-                            retries,
-                        })
-                        .unwrap();
+                    self.send_db_request(DbRequest::ListSchemas {
+                        server_id: server.id,
+                        database,
+                        retries,
+                    })
+                    .unwrap();
                     // self.connect_to_database(&server, database);
                     None
                 }
@@ -997,8 +1044,7 @@ impl Update<Msg> for Model {
                     Some(Msg::LoadDatabases(server_id))
                 }
                 Msg::LoadDatabases(server_id) => {
-                    self.connection_manager_tx
-                        .send(DbRequest::ListDatabases(server_id))
+                    self.send_db_request(DbRequest::ListDatabases(server_id))
                         .unwrap();
 
                     None
@@ -1112,15 +1158,14 @@ impl Update<Msg> for Model {
                     //         data: execute_result,
                     //     }),
                     // ));
-                    self.connection_manager_tx
-                        .send(DbRequest::Execute(
-                            // self.get_or_set_shown_editor_id().unwrap(),
-                            editor_id.server_id,
-                            editor_id.database,
-                            query,
-                            retries,
-                        ))
-                        .unwrap();
+                    self.send_db_request(DbRequest::Execute(
+                        // self.get_or_set_shown_editor_id().unwrap(),
+                        editor_id.server_id,
+                        editor_id.database,
+                        query,
+                        retries,
+                    ))
+                    .unwrap();
 
                     // println!("got execute result: {:?}", execute_result);
                     // return Some(Msg::QueryResultFetched(QueryResult {

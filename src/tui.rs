@@ -71,6 +71,11 @@ pub(crate) enum Msg {
         remove_input: bool,
     },
 
+    TriggerRedraw,
+
+    PopDbRequestStatus,
+    
+
     None,
 }
 
@@ -94,8 +99,12 @@ pub enum Id {
     ServerNameInput,
     ConnectionUrlInput,
     FormSubmitListener,
-
+    
     ExecuteErrorResult,
+    
+    DbResponseStatusListener,
+    StatusSpinner,
+    StatusSpan,
 }
 
 pub(crate) fn run(debug_logs: bool) -> eyre::Result<()> {

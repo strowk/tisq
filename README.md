@@ -206,10 +206,10 @@ tisq server add [name] [connection-url]
 - [x] Add schemas and tables to tree view
 - [x] Add standard postgres snippets expansion
 - [x] Display available snippets to choose from
+- [x] status line: Show loading while executing query
 - [ ] Allow to add custom snippets
 - [ ] Add other objects to tree view (views, functions, etc)
 - [ ] Show table columns in tree view
-- [ ] status line: Show loading while executing query
 - [ ] Add support for more Postgres types (from https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html )
 - [ ] Error handling: remove all unwrap() calls and anything else that can panic
 - [ ] Customize keybindings in UI

@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-WIP
+### Added
+
+- Status line to show loading while communicating with database.
 
 ## [0.1.12] - 2023-11-02
 

@@ -9,6 +9,7 @@ mod execute_result_table;
 mod global_keys;
 mod label;
 mod snippets_table;
+mod status;
 mod tabs;
 
 // -- export
@@ -21,6 +22,9 @@ pub use editor::Editor;
 pub(crate) use error_result::ErrorResult;
 pub(crate) use execute_result_table::ExecuteResultTable;
 pub(crate) use snippets_table::SnippetsTable;
+pub(crate) use status::DbResponseStatusListener;
+pub(crate) use status::StatusSpan;
+pub(crate) use status::StatusSpinner;
 
 pub use global_keys::GlobalListener;
 pub use label::Label;

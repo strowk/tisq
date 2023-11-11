@@ -1,10 +1,20 @@
 use std::collections::HashMap;
 
+use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize, Serialize)]
 pub(crate) struct Snippet {
     pub shortcut: String,
     pub description: String,
     pub query: String,
 }
+
+#[derive(Deserialize, Serialize, PartialEq, Eq, Hash)]
+pub(crate) enum SnippetDatabase {
+    Postgres,
+}
+
+pub(crate) type SnippetsConfig = HashMap<SnippetDatabase, Vec<Snippet>>;
 
 pub(crate) fn standard_postgres_snippets() -> HashMap<String, Snippet> {
     HashMap::from([

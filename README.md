@@ -158,13 +158,11 @@ Config section: `result`.
 
 Snippets are small shortcuts that can be expanded into SQL code.
 
-Currently only standard Postgres snippets are supported, but in future it will be possible to add custom snippets.
-
 You can enter snippet shortcut and press `Ctrl+Space` to attempt to expand it.
 In case if no snippets matched, you will see a table with available snippets to choose from.
 Then you can use `Enter` key to aplly selected snippet or use `GlobalCancel` (defaults to `Esc`) to cancel selection of snippet.
 
-### Supported snippets
+### Standard Postgres snippets
 
 | Shortcut | Expansion        |
 | -------- | ---------------- |
@@ -180,6 +178,25 @@ Then you can use `Enter` key to aplly selected snippet or use `GlobalCancel` (de
 | `alt`    | `ALTER TABLE`    |
 | `dro`    | `DROP TABLE`     |
 | `trun`   | `TRUNCATE TABLE` |
+
+### Custom snippets
+
+You can add your own snippets to `~/.tisq/config.toml` file like this:
+
+```toml
+[[snippets.Postgres]]
+shortcut = "kc"
+description = "kill connection"
+query = """
+SELECT pg_terminate_backend(pid) 
+FROM pg_stat_activity 
+WHERE pid =
+"""
+```
+
+This would add a snippet with shortcut `kc` that would be expanded into the query that kills connection by its process id.
+
+If you add a snippet with shortcut that already exists, it would override the existing one.
 
 ## Subcommands
 
@@ -207,7 +224,7 @@ tisq server add [name] [connection-url]
 - [x] Add standard postgres snippets expansion
 - [x] Display available snippets to choose from
 - [x] status line: Show loading while executing query
-- [ ] Allow to add custom snippets
+- [x] Allow to add custom snippets
 - [ ] Add other objects to tree view (views, functions, etc)
 - [ ] Show table columns in tree view
 - [ ] Add support for more Postgres types (from https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html )

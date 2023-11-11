@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use crate::app::{TisqKeyboundAction, KeybindingsConfig};
+use crate::app::{TisqKeyboundAction, KeybindingsConfig, SnippetsConfig};
 
 #[derive(Serialize, Deserialize)]
 pub(crate) struct TisqConfig {
     pub(crate) keybindings: Option<KeybindingsConfig<TisqKeyboundAction>>,
+    pub(crate) snippets: Option<SnippetsConfig>,
 }
 
 impl TisqConfig {

@@ -129,6 +129,18 @@ impl Model {
 
         let spinner_ticking = SpinnerTickingPort::new();
 
+        let mut snippets_library = standard_postgres_snippets();
+
+        if let Some(mut snippets) = config.snippets {
+            snippets
+                .remove(&snippets::SnippetDatabase::Postgres)
+                .map(|snippets| {
+                    snippets.into_iter().for_each(|snippet| {
+                        snippets_library.insert(snippet.shortcut.clone(), snippet);
+                    });
+                });
+        }
+
         let mut model = Self {
             app: Self::init_app(
                 &keybindings,
@@ -157,7 +169,7 @@ impl Model {
             execute_result_state: ExecuteResultState::FetchedTable,
 
             showing_snippets: false,
-            snippets_library: standard_postgres_snippets(),
+            snippets_library,
 
             keybindings,
             spinner_ticking,

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Status line to show loading while communicating with database.
+- Custom snippets support.
 
 ## [0.1.12] - 2023-11-02
 

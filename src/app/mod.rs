@@ -22,4 +22,5 @@ pub(crate) use keybindings::SectionKeybindings;
 pub(crate) use keybindings::TisqKeyboundAction;
 pub(crate) use model::EditorId;
 pub(crate) use snippets::Snippet;
+pub(crate) use snippets::SnippetsConfig;
 pub(crate) use user_event::TisqEvent;

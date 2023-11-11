@@ -10,7 +10,7 @@ CACHE_FROM = { value = "type=local,src=../../docker-cache", condition = { env_no
 script_runner = "@shell"
 cwd = "changelog"
 script = '''
-npm ci
+npm ci --silent
 '''
 
 [tasks.lint-changelog]

@@ -71,7 +71,6 @@ jobs:
         env:
           CACHE_TO: type=gha,mode=max,scope=${{ matrix.cache }}
           CACHE_FROM: type=gha,scope=${{ matrix.cache }}
-          CROSS_CONTAINER_ENGINE_NO_BUILDKIT: 1
       - id: cargo-version
         if: matrix.docker_platform != null
         run: cargo make get-version-for-github

@@ -16,7 +16,7 @@ jobs:
         run: |-
           echo Checking changelog file...
           set -e
-          npm ci --prefix changelog
+          npm ci --prefix changelog --silent
           node changelog/lint.mjs
 
   build:

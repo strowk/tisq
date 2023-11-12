@@ -98,6 +98,31 @@ impl Connection {
             }
         }
     }
+
+    pub(crate) async fn list_columns(
+        &mut self,
+        schema: &str,
+        table: &str,
+    ) -> Result<Vec<String>, sqlx::Error> {
+        match &mut self.internal {
+            TypedConnection::Postgres(connection) => {
+                let mut args = PgArguments::default();
+                args.add(schema);
+                args.add(table);
+                let tables = connection
+                    .fetch_all(sqlx::query_with(
+                        "SELECT column_name FROM information_schema.columns where table_schema = $1 and table_name = $2;",
+                        args,
+                    ))
+                    .await?;
+                let columns: Vec<String> = tables
+                    .iter()
+                    .map(|row| row.get::<String, usize>(0))
+                    .collect();
+                Ok(columns)
+            }
+        }
+    }
 }
 
 #[derive(Hash, PartialEq, Eq)]
@@ -122,6 +147,13 @@ pub(crate) enum DbRequest {
         server_id: Uuid,
         database: String,
         schema: String,
+        retries: i32,
+    },
+    ListColumns {
+        server_id: Uuid,
+        database: String,
+        schema: String,
+        table: String,
         retries: i32,
     },
     ListDatabases(Uuid),
@@ -149,6 +181,13 @@ pub(crate) enum DbResponse {
         database: String,
         schema: String,
         tables: Vec<String>,
+    },
+    ColumnsListed {
+        server_id: Uuid,
+        database: String,
+        schema: String,
+        table: String,
+        columns: Vec<String>,
     },
     Connected(Uuid),
     Executed(Uuid, Vec<String>, Vec<Vec<String>>),
@@ -198,6 +237,41 @@ impl ConnectionsManager {
 
     fn process_request(&mut self, request: DbRequest) -> DbResponse {
         match request {
+            DbRequest::ListColumns {
+                server_id,
+                database,
+                schema,
+                table,
+                retries,
+            } => {
+                let connection_key = ConnectionKey {
+                    name: database.to_string(),
+                    server_id,
+                };
+                let repeat = || DbRequest::ListColumns {
+                    server_id,
+                    database: (&database).to_string(),
+                    schema: (&schema).to_string(),
+                    table: (&table).to_string(),
+                    retries: retries + 1,
+                };
+                if let Some(connection) = self.connections.get_mut(&connection_key) {
+                    match task::block_on(connection.list_columns(&schema, &table)) {
+                        Ok(columns) => DbResponse::ColumnsListed {
+                            server_id,
+                            database: database.to_string(),
+                            schema: schema.to_string(),
+                            table: table.to_string(),
+                            columns,
+                        },
+                        Err(e) => {
+                            self.process_db_error(&connection_key, e, server_id, Some(&repeat))
+                        }
+                    }
+                } else {
+                    DbResponse::Error(server_id, "No connection to database".to_string())
+                }
+            }
             DbRequest::ListTables {
                 server_id,
                 database,

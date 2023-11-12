@@ -17,6 +17,13 @@ pub enum BrowserTreeId {
     Database(Uuid, String),
     Schema(Uuid, String, String),
     Table(Uuid, String, String, String),
+    Column {
+        server_id: Uuid,
+        database: String,
+        schema: String,
+        table: String,
+        column: String,
+    },
 }
 
 impl BrowserTreeId {
@@ -69,6 +76,19 @@ impl BrowserTreeId {
                     parts.next()?.to_string(),
                 ))
             }
+            "column" => {
+                let node: &str = parts.next()?;
+                let mut parts = node.splitn(4, ':');
+                let server_id = parts.next()?;
+                let server_id = Self::parse_server_uuid(server_id)?;
+                Some(Self::Column {
+                    server_id,
+                    database: parts.next()?.to_string(),
+                    schema: parts.next()?.to_string(),
+                    table: parts.next()?.to_string(),
+                    column: parts.next()?.to_string(),
+                })
+            }
             _ => None,
         }
     }
@@ -82,6 +102,18 @@ impl BrowserTreeId {
             }
             Self::Table(server_id, database, schema, table) => {
                 format!("table:{}:{}:{}:{}", server_id, database, schema, table)
+            }
+            Self::Column {
+                server_id,
+                database,
+                schema,
+                table,
+                column,
+            } => {
+                format!(
+                    "column:{}:{}:{}:{}:{}",
+                    server_id, database, schema, table, column
+                )
             }
         }
     }
@@ -190,6 +222,56 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                 return Some(Msg::None);
             }
 
+            Event::User(TisqEvent::DbResponse(DbResponse::ColumnsListed {
+                server_id,
+                database,
+                schema,
+                table,
+                columns,
+            })) => {
+                // tracing::debug!("Schemas listed: {:?}", tables);
+                let table_id: BrowserTreeId = BrowserTreeId::Table(
+                    server_id,
+                    database.clone(),
+                    schema.clone(),
+                    table.clone(),
+                );
+                let tree_id = table_id.to_string();
+                {
+                    let tree = self.component.tree_mut();
+                    let node = tree.root_mut().query_mut(&tree_id)?;
+                    node.clear();
+                    for column in columns {
+                        let id = BrowserTreeId::Column {
+                            server_id,
+                            database: database.clone(),
+                            schema: schema.clone(),
+                            table: table.clone(),
+                            column: column.clone(),
+                        }
+                        .to_string();
+                        let column_node = Node::new(id, column.clone());
+
+                        // dummy is created to make the table node expandable
+                        // it is a workaround for the limitation of the treeview component
+                        // let dummy: Node = Node::new(
+                        //     format!("dummy:{}/{}/{}/{}", server_id, database, schema),
+                        //     "loading tables...".to_string(),
+                        // );
+                        // table_node.add_child(dummy);
+
+                        node.add_child(column_node);
+                    }
+                }
+                // This solution can work as well without blocking, but requires
+                // open access to open_node method as well as new one tree_state_mut
+                let node = self.component.tree().root().query(&tree_id)?.clone();
+                let root = self.component.tree().root().clone();
+                self.component.tree_state_mut().open_node(&root, &node);
+
+                return Some(Msg::None);
+            }
+
             Event::User(TisqEvent::DbResponse(DbResponse::TablesListed {
                 server_id,
                 database,
@@ -211,15 +293,15 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                             table.clone(),
                         )
                         .to_string();
-                        let table_node = Node::new(id, table.clone());
+                        let mut table_node = Node::new(id, table.clone());
 
                         // dummy is created to make the table node expandable
                         // it is a workaround for the limitation of the treeview component
-                        // let dummy: Node = Node::new(
-                        //     format!("dummy:{}/{}/{}/{}", server_id, database, schema),
-                        //     "loading tables...".to_string(),
-                        // );
-                        // table_node.add_child(dummy);
+                        let dummy: Node = Node::new(
+                            format!("dummy:{}/{}/{}/{}", server_id, database, schema, table),
+                            "loading tables...".to_string(),
+                        );
+                        table_node.add_child(dummy);
 
                         node.add_child(table_node);
                     }
@@ -369,6 +451,15 @@ impl Component<Msg, TisqEvent> for BrowserTree {
                                 server_id,
                                 database,
                                 schema,
+                                retries: 0,
+                            })
+                        }
+                        Some(BrowserTreeId::Table(server_id, database, schema, table)) => {
+                            return Some(Msg::OpenTable {
+                                server_id,
+                                database,
+                                schema,
+                                table,
                                 retries: 0,
                             })
                         }

@@ -55,6 +55,13 @@ pub(crate) enum Msg {
         schema: String,
         retries: i32,
     },
+    OpenTable {
+        server_id: Uuid,
+        database: String,
+        schema: String,
+        table: String,
+        retries: i32,
+    },
     OpenConnection(Uuid),
     LoadDatabases(Uuid),
 
@@ -74,7 +81,6 @@ pub(crate) enum Msg {
     TriggerRedraw,
 
     PopDbRequestStatus,
-    
 
     None,
 }
@@ -99,9 +105,9 @@ pub enum Id {
     ServerNameInput,
     ConnectionUrlInput,
     FormSubmitListener,
-    
+
     ExecuteErrorResult,
-    
+
     DbResponseStatusListener,
     StatusSpinner,
     StatusSpan,

@@ -856,6 +856,24 @@ impl Update<Msg> for Model {
                         Some(Msg::ShowSnippets)
                     }
                 }
+                Msg::OpenTable {
+                    server_id,
+                    database,
+                    schema,
+                    table,
+                    retries,
+                } => {
+                    let server = self.storage.get_server(server_id).unwrap().unwrap();
+                    self.send_db_request(DbRequest::ListColumns {
+                        server_id: server.id,
+                        database,
+                        schema,
+                        table,
+                        retries,
+                    })
+                    .unwrap();
+                    None
+                }
                 Msg::OpenSchema {
                     server_id,
                     database,

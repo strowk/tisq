@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-WIP
+### Added
+
+- List table columns in database tree view.
 
 ## [0.1.13] - 2023-11-11
 

@@ -1,4 +1,4 @@
-use tui_realm_stdlib::Table;
+use tui_realm_stdlib::{Table, WidthsUnit};
 use tuirealm::command::{Cmd, CmdResult, Direction, Position};
 use tuirealm::event::{KeyEventKind, KeyModifiers};
 use tuirealm::props::{
@@ -50,7 +50,8 @@ impl ExecuteResultTable {
                 .step(4)
                 .row_height(1)
                 // .headers(&["Column 1"])
-                .column_spacing(3)
+                .column_spacing(2)
+                .widths_unit(WidthsUnit::Length)
                 .widths(&[30, 20, 50]),
         }
     }
@@ -129,14 +130,14 @@ impl ExecuteResultTable {
         let total = absolute_widths.iter().sum::<u16>();
 
         // transform to percentages
-        absolute_widths
-            .iter()
-            .map(|x| (*x as f64 / total as f64 * 100.0) as u16)
-            .collect::<Vec<u16>>()
+        // absolute_widths
+        //     .iter()
+        //     .map(|x| (*x as f64 / total as f64 * 100.0) as u16)
+        //     .collect::<Vec<u16>>()
 
         // TODO: change underlying table to use absolute widths instead of percentages
 
-        // absolute_widths
+        absolute_widths
 
         // if result.data.is_empty() {
         //     return vec![];

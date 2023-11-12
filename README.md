@@ -149,8 +149,8 @@ Config section: `result`.
 
 | Default Keybindings | Description                | Config name               |
 | ------------------- | -------------------------- | ------------------------- |
-| Ctrl+Left           | Scroll columns to left     | `ResultOffsetColumnLeft`  |
-| Ctrl+Right          | Scroll columns to right    | `ResultOffsetColumnRight` |
+| Left                | Scroll columns to left     | `ResultOffsetColumnLeft`  |
+| Right               | Scroll columns to right    | `ResultOffsetColumnRight` |
 | Up, Down            | Move selected line pointer | -                         |
 | PageUp, PageDown    | Move by page               | -                         |
 

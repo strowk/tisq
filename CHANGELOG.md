@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - List table columns in database tree view.
+- Show columns by length in query result instead of percentage.
+
+### Changed
+
+- Use Right and Left arrows without control to scroll query result columns.
 
 ## [0.1.13] - 2023-11-11
 

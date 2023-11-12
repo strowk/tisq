@@ -283,14 +283,14 @@ impl KeyboundAction for TisqKeyboundAction {
             &TisqKeyboundAction::ResultOffsetColumnLeft => {
                 vec![KeybindingKeyPress {
                     key: Key::Left,
-                    modifiers: KeyModifiers::CONTROL,
+                    modifiers: KeyModifiers::NONE,
                 }]
             }
 
             &TisqKeyboundAction::ResultOffsetColumnRight => {
                 vec![KeybindingKeyPress {
                     key: Key::Right,
-                    modifiers: KeyModifiers::CONTROL,
+                    modifiers: KeyModifiers::NONE,
                 }]
             }
 

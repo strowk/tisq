@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+WIP
+
+## [0.1.14] - 2023-11-14
+
 ### Added
 
 - List table columns in database tree view.
@@ -145,7 +149,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Execution results view supporting only successful fetched results.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.13...HEAD
+[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.14...HEAD
+[0.1.14]: https://github.com/strowk/tisq/compare/v0.1.13...v0.1.14
 [0.1.13]: https://github.com/strowk/tisq/compare/v0.1.12...v0.1.13
 [0.1.12]: https://github.com/strowk/tisq/compare/v0.1.11...v0.1.12
 [0.1.11]: https://github.com/strowk/tisq/compare/v0.1.10...v0.1.11

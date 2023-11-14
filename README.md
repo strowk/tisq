@@ -103,6 +103,8 @@ GlobalExit = [
 In this example it is demonstrated how to specify special keys, such as Esc,
 using simple `type = "Esc"` and how characters are specified using `type = "Char"` with `args` field that contains the character.
 
+For sptecifying several modifiers, you can list them separated by `+`, like this: `modifiers = "Ctrl+Alt"`.
+
 ### Global
 
 Config section: `globals`.

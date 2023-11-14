@@ -219,6 +219,11 @@ Add new server to the list of servers in storage under `~/.tisq`.
 tisq server add [name] [connection-url]
 ```
 
+## Other guides and tips
+
+- [Kubernetes example](https://github.com/strowk/tisq/wiki/Kubernetes-example)
+- [VS Code Keybindings](https://github.com/strowk/tisq/wiki/VS-Code-Keybindings)
+
 ## Roadmap
 
 - [x] Customizable keybindings by config TOML file

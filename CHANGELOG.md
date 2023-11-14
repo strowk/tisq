@@ -15,10 +15,10 @@ WIP
 ### Added
 
 - List table columns in database tree view.
-- Show columns by length in query result instead of percentage.
 
 ### Changed
 
+- Show columns by length in query result instead of percentage.
 - Use Right and Left arrows without Ctrl to scroll query result columns.
 
 ## [0.1.13] - 2023-11-11

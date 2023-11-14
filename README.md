@@ -10,8 +10,9 @@ Features:
 - Write and execute SQL queries.
 - View query execution results in table.
 - Switch between multiple query tabs with different connections.
-- Customizable keybindings by config TOML file.
 - Save query editors content on exit and restore on start.
+- Customizable keybindings by config TOML file.
+- Customizable snippets expansion with a set of predefined queries.
 
 ## Status
 
@@ -19,7 +20,7 @@ In active development. Not ready for production use, there are no tests, incompl
 
 ### Database support
 
-Only Postgres is supported at the moment and with very limited set of types.
+Only Postgres is supported at the moment and with limited set of types. If type is not yet supported, value would be displayed as `not supported` in a table.
 
 ## Installation
 
@@ -226,19 +227,19 @@ tisq server add [name] [connection-url]
 - [x] status line: Show loading while executing query
 - [x] Allow to add custom snippets
 - [x] Show table columns in tree view
+- [ ] Optimize for queries with big results by paging
 - [ ] Add other objects to tree view (views, functions, etc)
 - [ ] Add support for more Postgres types (from https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html )
 - [ ] Error handling: remove all unwrap() calls and anything else that can panic
-- [ ] Customize keybindings in UI
-- [ ] themes: Customizeable style by config TOML file
-- [ ] Add support for query parameters
 - [ ] Add support for query history
-- [ ] Add support for query execution plan
-- [ ] Support queries with big results by paging
 - [ ] Limit query result size by amount of rows
 - [ ] Better limit of query result by memory size (use https://docs.rs/datasize/latest/datasize/ )
 - [ ] Syntax highlighting for query editor
 - [ ] databases: Add support for MySQL
 - [ ] databases: Add support for SQLite
+- [ ] Add support for query parameters
+- [ ] Add support for query execution plan
 - [ ] databases: Add support for MS SQL Server (via https://github.com/prisma/tiberius )
+- [ ] themes: Customizeable style by config TOML file
+- [ ] Customize keybindings in UI
 -

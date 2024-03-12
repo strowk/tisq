@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Query editor now would ignore non-alphabetic keys when Alt or Ctrl is pressed.
 
+### Fixed
+
+- Fixed crash when uncommenting line with Ctrl+/ with cursor in the beginning of the line.
+
 ## [0.1.14] - 2023-11-14
 
 ### Added

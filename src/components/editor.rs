@@ -162,10 +162,18 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
                         self.perform(Cmd::Cancel);
                         self.perform(Cmd::Cancel);
 
-                        return_to_column = return_to_column - 2;
+                        if return_to_column < 3 {
+                            return_to_column = 0;
+                        } else {
+                            return_to_column = return_to_column - 2;
+                        }
                         if current_line.starts_with("-- ") {
                             self.perform(Cmd::Cancel);
-                            return_to_column = return_to_column - 1;
+                            if return_to_column < 2 {
+                                return_to_column = 0;
+                            } else {
+                                return_to_column = return_to_column - 1;
+                            }
                         }
                     }
 

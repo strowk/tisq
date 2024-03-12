@@ -31,27 +31,32 @@ impl Serialize for KeyModifiersConfig {
         let modifiers = match self {
             KeyModifiersConfig::TuiModifiers(modifiers) => modifiers,
         };
-        let mut result: String = "".to_string();
-        let mut has_one = false;
-        if modifiers.intersects(KeyModifiers::CONTROL) {
-            result = result + "Ctrl";
-            has_one = true
-        }
-        if modifiers.intersects(KeyModifiers::ALT) {
-            if has_one {
-                result = result + "+";
-            }
-            result = result + "Alt";
-            has_one = true;
-        }
-        if modifiers.intersects(KeyModifiers::SHIFT) {
-            if has_one {
-                result = result + "+";
-            }
-            result = result + "Shift";
-        }
+        let result = key_modifiers_to_string(modifiers);
         serializer.serialize_str(&result)
     }
+}
+
+fn key_modifiers_to_string(modifiers: &KeyModifiers) -> String {
+    let mut result: String = "".to_string();
+    let mut has_one = false;
+    if modifiers.intersects(KeyModifiers::CONTROL) {
+        result = result + "Ctrl";
+        has_one = true
+    }
+    if modifiers.intersects(KeyModifiers::ALT) {
+        if has_one {
+            result = result + "+";
+        }
+        result = result + "Alt";
+        has_one = true;
+    }
+    if modifiers.intersects(KeyModifiers::SHIFT) {
+        if has_one {
+            result = result + "+";
+        }
+        result = result + "Shift";
+    }
+    result
 }
 
 struct KeyModifiersConfigVisitor;
@@ -114,6 +119,21 @@ pub(crate) type KeybindingsConfig<A> = HashMap<String, KeybindingSectionConfig<A
 pub(crate) struct KeybindingKeyPress {
     pub key: Key,
     pub modifiers: KeyModifiers,
+}
+
+impl fmt::Display for KeybindingKeyPress {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let formatted_key = if let Key::Char(key) = self.key {
+            format!("{}", key.to_uppercase())
+        } else {
+            format!("{:?}", self.key)
+        };
+        let key_modifiers = key_modifiers_to_string(&self.modifiers);
+        if key_modifiers.is_empty() {
+            return write!(f, "{}", formatted_key);
+        }
+        write!(f, "{}+{}", key_modifiers, formatted_key)
+    }
 }
 
 impl From<&KeyPressConfig> for KeybindingKeyPress {

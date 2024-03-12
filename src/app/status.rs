@@ -5,7 +5,7 @@ use tuirealm::{
 
 use crate::{
     app::{DbResponse, TisqEvent},
-    components::{StatusSpan, StatusSpinner},
+    components::{PressedKey, StatusSpan, StatusSpinner},
     tui::{Id, Msg},
 };
 
@@ -61,7 +61,8 @@ impl AppStatus {
             .direction(Direction::Horizontal)
             .constraints(vec![
                 Constraint::Length(2),
-                Constraint::Min(0), // fills remaining space
+                Constraint::Min(0),     // fills remaining space
+                Constraint::Length(20), // Ctrl+Shift+Alt+Enter is the longest combination
             ])
             .split(rect);
 
@@ -69,9 +70,10 @@ impl AppStatus {
             app.view(&Id::StatusSpinner, f, chunks[0]);
             app.view(&Id::StatusSpan, f, chunks[1]);
         }
+        app.view(&Id::StatusPressedKey, f, chunks[2]);
     }
 
-    pub(super) fn mount(app: &mut TisqApplication) {
+    pub(super) fn mount_spinner(app: &mut TisqApplication) {
         assert!(app
             .mount(
                 Id::StatusSpinner,
@@ -89,9 +91,21 @@ impl AppStatus {
                 ]
             )
             .is_ok());
+    }
 
+    pub(super) fn mount_span(app: &mut TisqApplication) {
         assert!(app
             .mount(Id::StatusSpan, Box::new(StatusSpan::default()), vec![])
+            .is_ok());
+    }
+
+    pub(super) fn mount_pressed_key(app: &mut TisqApplication, enabled_showing_pressed_key: bool) {
+        assert!(app
+            .mount(
+                Id::StatusPressedKey,
+                Box::new(PressedKey::default()),
+                PressedKey::subscriptions(enabled_showing_pressed_key)
+            )
             .is_ok());
     }
 }

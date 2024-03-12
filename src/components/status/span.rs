@@ -16,7 +16,7 @@ impl Default for StatusSpan {
         Self {
             component: Span::default()
                 .foreground(Color::Green)
-                .spans(&[TextSpan::new("Processing database request... ").underlined()]),
+                .spans(&[TextSpan::new("Process db req... ").underlined()]),
         }
     }
 }

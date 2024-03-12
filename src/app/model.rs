@@ -6,9 +6,9 @@ use crate::app::event_dispatcher::EventDispatcherPort;
 use crate::app::keybindings::{BROWSER_SECTION, GLOBAL_SECTION, QUERY_RESULT_SECTION};
 use crate::app::spinner_ticking_port::SpinnerTickingPort;
 use crate::components::{
-    AddServerForm, BrowserTree, DbResponseStatusListener, Editor, EditorTabs, ErrorResult,
-    ExecuteResultTable, FormSubmitListener, GlobalListener, InputText, SentTree, SnippetsTable,
-    ACTIVE_TAB_INDEX,
+    AddServerForm, BrowserTree, CommandLine, DbResponseStatusListener, Editor, EditorTabs,
+    ErrorResult, ExecuteResultTable, FormSubmitListener, GlobalListener, InputText, SentTree,
+    SettingsForm, SnippetsTable, ACTIVE_TAB_INDEX,
 };
 
 use super::config::TisqConfig;
@@ -70,6 +70,13 @@ pub struct Model {
     snippets_library: HashMap<String, Snippet>,
     showing_snippets: bool,
     execute_result_state: ExecuteResultState,
+
+    showing_command_line: bool,
+
+    showing_pressed_key: bool,
+
+    settings_form: SettingsForm,
+    showing_settings: bool,
 
     keybindings: Keybindings<TisqKeyboundAction>,
     spinner_ticking: SpinnerTickingPort,
@@ -141,6 +148,9 @@ impl Model {
                 });
         }
 
+        let enabled_showing_pressed_key =
+            storage.get_enabled_showing_pressed_key().unwrap_or(false);
+
         let mut model = Self {
             app: Self::init_app(
                 &keybindings,
@@ -174,10 +184,25 @@ impl Model {
             keybindings,
             spinner_ticking,
 
+            settings_form: SettingsForm::new(),
+            showing_settings: false,
+
+            showing_pressed_key: enabled_showing_pressed_key,
+
             app_status: AppStatus::default(),
+
+            showing_command_line: false,
         };
         model.restore_editors();
-        AppStatus::mount(&mut model.app);
+        tracing::debug!(
+            "mounting status line with enabled_showing_pressed_key: {}",
+            enabled_showing_pressed_key
+        );
+        AppStatus::mount_spinner(&mut model.app);
+        AppStatus::mount_span(&mut model.app);
+        AppStatus::mount_pressed_key(&mut model.app, enabled_showing_pressed_key);
+        SettingsForm::mount(&mut model.app, enabled_showing_pressed_key);
+        model.mount_command_line();
         model
     }
 
@@ -188,20 +213,30 @@ impl Model {
             .terminal
             .raw_mut()
             .draw(|f| {
-                let content_and_status = Layout::default()
+                let cli_content_and_status = Layout::default()
                     .direction(Direction::Vertical)
-                    .margin(1)
+                    .margin(0)
                     .constraints(
                         [
+                            Constraint::Length(if self.showing_command_line { 3 } else { 0 }), // Command line
                             Constraint::Min(0),    // Content
                             Constraint::Length(1), // Status line
                         ]
                         .as_ref(),
                     )
                     .split(f.size());
-                let content = content_and_status[0];
-                let status_line = content_and_status[1];
+
+                let command_line = cli_content_and_status[0];
+
+                if self.showing_command_line {
+                    self.app.view(&Id::CommandLine, f, command_line);
+                }
+
+                let status_line = cli_content_and_status[2];
+
                 self.app_status.view(status_line, f, &mut self.app);
+
+                let content = cli_content_and_status[1];
 
                 let sides = Layout::default()
                     .direction(Direction::Horizontal)
@@ -232,7 +267,9 @@ impl Model {
                 // self.app.view(&Id::Label, f, chunks[3]);
                 self.app.view(&Id::Tree, f, left);
 
-                if self.adding_server {
+                if self.showing_settings {
+                    self.settings_form.view(right, &mut self.app, f);
+                } else if self.adding_server {
                     // self.app.view(&Id::AddServerForm, f, right);
                     self.add_server_form.view(right, &mut self.app, f);
                 } else {
@@ -309,6 +346,17 @@ impl Model {
             }
         }
         node
+    }
+
+    fn mount_command_line(&mut self) {
+        assert!(self
+            .app
+            .mount(
+                Id::CommandLine,
+                Box::new(CommandLine::new("Command Line", ":")),
+                vec![]
+            )
+            .is_ok());
     }
 
     fn mount_snippets_table(&mut self) {
@@ -795,6 +843,22 @@ impl Model {
         self.connect_to_server(&server);
         self.connect_to_database(&server, editor_id.database.clone());
     }
+
+    fn show_settings(&mut self) {
+        self.app.active(&Id::ShowUsedKeyToggle).unwrap();
+        self.showing_settings = true;
+    }
+
+    fn finish_adding_server(&mut self) {
+        self.app.active(&Id::Tree).unwrap();
+        self.unmount_server_add_form();
+        self.add_server_form_mounted = false;
+        self.adding_server = false;
+    }
+
+    fn exit_command_line(&mut self) {
+        self.showing_command_line = false;
+    }
 }
 
 impl Update<Msg> for Model {
@@ -804,6 +868,32 @@ impl Update<Msg> for Model {
             self.redraw = true;
             // Match message
             match msg {
+                Msg::SetEnabledLastEnteredKey(is_enabled) => {
+                    self.showing_pressed_key = is_enabled;
+                    self.storage
+                        .set_enabled_showing_pressed_key(is_enabled)
+                        .unwrap();
+                    self.app.umount(&Id::StatusPressedKey).unwrap();
+                    AppStatus::mount_pressed_key(&mut self.app, is_enabled);
+                    None
+                }
+                Msg::ExecuteCommand(cmd) => {
+                    match cmd.as_str() {
+                        "settings" => {
+                            self.show_settings();
+                            self.exit_command_line();
+                        }
+                        _ => (),
+                    };
+                    None
+                }
+                Msg::EnterCommandMode => {
+                    // self.show_settings();
+                    // tracing::debug!("entering command mode");
+                    self.app.active(&Id::CommandLine).unwrap();
+                    self.showing_command_line = true;
+                    None
+                }
                 Msg::PopDbRequestStatus => {
                     self.app_status.pop_db_request(&mut self.spinner_ticking);
                     None
@@ -814,8 +904,16 @@ impl Update<Msg> for Model {
                         self.showing_snippets = false;
                         self.app.umount(&Id::SnippetsTable).unwrap();
                         None
+                    } else if self.showing_command_line {
+                        self.exit_command_line();
+                        self.app.active(&Id::Tree).unwrap(); // TODO: activate what was active before?
+                        None
+                    } else if self.showing_settings {
+                        self.showing_settings = false;
+                        self.app.active(&Id::Tree).unwrap();
+                        None
                     } else if self.adding_server {
-                        // TODO: cancel adding server
+                        self.finish_adding_server();
                         None
                     } else {
                         Some(Msg::AppClose)
@@ -1129,10 +1227,7 @@ impl Update<Msg> for Model {
 
                     self.update_browser();
 
-                    self.app.active(&Id::Tree).unwrap();
-                    self.unmount_server_add_form();
-                    self.add_server_form_mounted = false;
-                    self.adding_server = false;
+                    self.finish_adding_server();
 
                     None
                 }

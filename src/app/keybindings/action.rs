@@ -14,6 +14,7 @@ pub(crate) enum TisqKeyboundAction {
     GlobalNavigateUp,
     GlobalNavigateDown,
     GlobalCancel,
+    GlobalCommandMode,
 
     EditorNextTab,
     EditorPrevTab,
@@ -61,6 +62,7 @@ impl KeyboundAction for TisqKeyboundAction {
                 &TisqKeyboundAction::GlobalNavigateUp,
                 &TisqKeyboundAction::GlobalNavigateDown,
                 &TisqKeyboundAction::GlobalCancel,
+                &TisqKeyboundAction::GlobalCommandMode,
             ],
             EDITOR_SECTION => vec![
                 &TisqKeyboundAction::EditorNextTab,
@@ -162,6 +164,13 @@ impl KeyboundAction for TisqKeyboundAction {
                 vec![KeybindingKeyPress {
                     key: Key::Char('n'),
                     modifiers: KeyModifiers::CONTROL,
+                }]
+            }
+
+            &TisqKeyboundAction::GlobalCommandMode => {
+                vec![KeybindingKeyPress {
+                    key: Key::Char(':'),
+                    modifiers: KeyModifiers::ALT | KeyModifiers::SHIFT,
                 }]
             }
 

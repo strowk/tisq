@@ -70,6 +70,24 @@ impl Storage {
         Ok(bucket)
     }
 
+    pub fn set_enabled_showing_pressed_key(&mut self, enabled: bool) -> eyre::Result<()> {
+        let bucket = self.store.bucket(Some("settings"))?;
+        let key = "show_pressed_key".to_string();
+        bucket.set(&key, &Json(enabled))?;
+        Ok(())
+    }
+
+    pub fn get_enabled_showing_pressed_key(&self) -> eyre::Result<bool> {
+        let bucket = self.store.bucket(Some("settings"))?;
+        let key = "show_pressed_key".to_string();
+        let enabled: Option<Json<bool>> = bucket.get(&key)?;
+        let enabled = match enabled {
+            Some(Json(enabled)) => enabled,
+            _ => false,
+        };
+        Ok(enabled)
+    }
+
     pub fn open(files_root: &PathBuf) -> eyre::Result<Storage> {
         let storage_path = files_root.join("storage");
 

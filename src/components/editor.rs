@@ -519,9 +519,10 @@ impl<'a> Component<Msg, TisqEvent> for Editor<'a> {
                     kind: KeyEventKind::Press,
                     modifiers,
                     ..
-                }) if !ch.is_alphabetic()
-                    || modifiers == KeyModifiers::NONE
-                    || modifiers == KeyModifiers::SHIFT =>
+                }) if (!ch.is_alphabetic()
+                    && (modifiers == KeyModifiers::NONE || modifiers == KeyModifiers::SHIFT))
+                    || (modifiers == KeyModifiers::NONE)
+                    || (modifiers == KeyModifiers::SHIFT) =>
                 {
                     // either a non-alphabetic char or an alphabetic char without modifiers to allow
                     // for global key bindings on alphabetic chars

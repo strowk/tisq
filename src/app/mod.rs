@@ -17,6 +17,7 @@ mod user_event;
 pub(crate) use connection::DbRequest;
 pub(crate) use connection::DbResponse;
 pub(crate) use keybindings::KeySubClause;
+pub(crate) use keybindings::KeybindingKeyPress;
 pub(crate) use keybindings::KeybindingsConfig;
 pub(crate) use keybindings::SectionKeybindings;
 pub(crate) use keybindings::TisqKeyboundAction;

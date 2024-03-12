@@ -82,6 +82,12 @@ pub(crate) enum Msg {
 
     PopDbRequestStatus,
 
+    EnterCommandMode,
+    ExecuteCommand(String),
+
+    // settings
+    SetEnabledLastEnteredKey(bool), // used to show/hide last entered key in status bar
+
     None,
 }
 
@@ -106,11 +112,16 @@ pub enum Id {
     ConnectionUrlInput,
     FormSubmitListener,
 
+    ShowUsedKeyToggle,
+
     ExecuteErrorResult,
 
     DbResponseStatusListener,
     StatusSpinner,
     StatusSpan,
+    StatusPressedKey,
+
+    CommandLine,
 }
 
 pub(crate) fn run(debug_logs: bool) -> eyre::Result<()> {

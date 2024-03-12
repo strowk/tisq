@@ -8,7 +8,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-WIP
+### Added
+
+- Exiting new server add form with Esc key.
+- Settings form to setup system-wide preferences.
+- Internal command line to navigate between views.
+- Keybinding to bring up internal command line defaulted to Shift+Alt+:.
+- Internal command ":settings" to open settings form.
+- Feature to show entered key in status line.
+- Toggle setting to enable showing entered key in status line.
+- Use Esc key to exit from settings form and from internal command line.
+
+### Changed
+
+- Query editor now would ignore non-alphabetic keys when Alt or Ctrl is pressed.
 
 ## [0.1.14] - 2023-11-14
 

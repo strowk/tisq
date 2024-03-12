@@ -109,14 +109,15 @@ For specifying several modifiers, you can list them separated by `+`, like this:
 
 Config section: `globals`.
 
-| Default Keybindings        | Description    | Config name           |
-| -------------------------- | -------------- | --------------------- |
-| Ctrl+c                     | Quit           | `GlobalExit`          |
-| Esc                        | Cancel or quit | `GlobalCancel`        |
-| Alt+Left / Ctrl+Alt+Left   | Navigate Left  | `GlobalNavigateLeft`  |
-| Alt+Right / Ctrl+Alt+Right | Navigate Right | `GlobalNavigateRight` |
-| Alt+Up / Ctrl+Alt+Up       | Navigate Up    | `GlobalNavigateUp`    |
-| Alt+Down / Ctrl+Alt+Down   | Navigate Down  | `GlobalNavigateDown`  |
+| Default Keybindings        | Description       | Config name           |
+| -------------------------- | ----------------- | --------------------- |
+| Ctrl+c                     | Quit              | `GlobalExit`          |
+| Esc                        | Cancel or quit    | `GlobalCancel`        |
+| Alt+Left / Ctrl+Alt+Left   | Navigate Left     | `GlobalNavigateLeft`  |
+| Alt+Right / Ctrl+Alt+Right | Navigate Right    | `GlobalNavigateRight` |
+| Alt+Up / Ctrl+Alt+Up       | Navigate Up       | `GlobalNavigateUp`    |
+| Alt+Down / Ctrl+Alt+Down   | Navigate Down     | `GlobalNavigateDown`  |
+| Shift+Alt+:                | Open command line | `GlobalCommandMode`   |
 
 `GlobalCancel` is used to cancel some of operations, such as applying snippet.
 In case if no such operation is in progress, it would serve as a quit command.

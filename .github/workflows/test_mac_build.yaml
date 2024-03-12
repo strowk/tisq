@@ -1,0 +1,38 @@
+# This workflow is temp for troubleshooting issue with mac x86 builds
+# , that is not reproducing locally
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - make: build-mac_x86_64
+            target: x86_64-apple-darwin
+    steps:
+      - uses: actions/checkout@master
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          key: build-${{matrix.target}}
+          path: |
+            ./target
+            ~/.cargo
+            ./cross
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v2
+      # Create target folder beforehand, as otherwise it would be
+      # created from container and would not have right user
+      - run: mkdir -p ./target
+      - run: if ! ( which cargo-make &>/dev/null ) ; then cargo install cargo-make ; fi
+        shell: bash
+      - run: if ! ( which cross &>/dev/null ) ; then cargo make install-cross ; fi
+        shell: bash
+      - run: cargo make ${{ matrix.make }}

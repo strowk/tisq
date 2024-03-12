@@ -24,8 +24,6 @@ Only Postgres is supported at the moment and with limited set of types. If type 
 
 ## Installation
 
-Note: currently MacOS x86_64 builds are not available due to incompatibility issues, but you can likely build from sources.
-
 ### With script
 
 In bash shell run:

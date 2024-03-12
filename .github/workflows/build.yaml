@@ -45,9 +45,9 @@ jobs:
             docker_base: alpine
           - make: build-windows_x86_64
             target: x86_64-pc-windows-gnu
-          # - make: build-mac_x86_64
-          #   target: x86_64-apple-darwin
-          #   cache: mac_x86_64
+          - make: build-mac_x86_64
+            target: x86_64-apple-darwin
+            cache: mac_x86_64
           - make: build-mac_arm
             target: aarch64-apple-darwin
             cache: mac_arm

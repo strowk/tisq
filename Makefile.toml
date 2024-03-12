@@ -158,8 +158,17 @@ args = [
     "--driver=docker-container",
 ]
 
+# This is a workaround to set min osx version to 10.12
+# , as Rust toolchain does not link below 10.12 anymore
+[tasks.build-patch-osx-min]
+command = "cp"
+args = [
+    "${CARGO_MAKE_WORKING_DIRECTORY}/patched-darwin.sh",
+    "${CARGO_MAKE_WORKING_DIRECTORY}/cross/docker/cross-toolchains/docker/darwin.sh",
+]
+
 [tasks.cross-image-mac_arm]
-dependencies = ["get-cross-toolchains", "create-docker-engine"]
+dependencies = ["get-cross-toolchains", "create-docker-engine", "build-patch-osx-min"]
 command = "cargo"
 cwd = "./cross"
 args = [
@@ -187,7 +196,7 @@ command = "cross"
 args = ["build", "--target", "aarch64-apple-darwin", "--release"]
 
 [tasks.cross-image-mac_x86_64]
-dependencies = ["get-cross-toolchains", "create-docker-engine"]
+dependencies = ["get-cross-toolchains", "create-docker-engine", "build-patch-osx-min"]
 command = "cargo"
 cwd = "./cross"
 args = [
@@ -196,7 +205,7 @@ args = [
     "--tag",
     "local",
     "--build-arg",
-    "MACOS_SDK_URL=https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz",
+    "MACOS_SDK_URL=https://github.com/joseluisq/macosx-sdks/releases/download/10.12/MacOSX10.12.sdk.tar.xz",
     "--cache-to",
     "${CACHE_TO}",
     "--cache-from",
@@ -210,6 +219,6 @@ args = [
 ]
 
 [tasks.build-mac_x86_64]
-dependencies = ["cross-image-mac_x86_64"]
+dependencies = ["cross-image-mac_x86_64", "build-patch-osx-min"]
 command = "cross"
 args = ["build", "--target", "x86_64-apple-darwin", "--release"]

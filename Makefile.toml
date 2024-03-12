@@ -124,13 +124,21 @@ args = ["build", "--target", "x86_64-pc-windows-gnu", "--release"]
 
 # Building binaries for MacOS
 
+[tasks.get-cross]
+dependencies = ["clone-cross", "checkout-cross"]
+
 [tasks.clone-cross]
 condition = { files_not_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/cross"] }
 command = "git"
 args = ["clone", "https://github.com/cross-rs/cross.git"]
 
+[tasks.checkout-cross]
+cwd = "./cross"
+command = "git"
+args = ["checkout", "3bfc6d54c817a2991f610d258f3290906c97474f"]
+
 [tasks.get-cross-toolchains]
-dependencies = ["clone-cross"]
+dependencies = ["get-cross"]
 command = "git"
 condition = { files_not_exist = [
     "${CARGO_MAKE_WORKING_DIRECTORY}/docker/cross-toolchains/README.md",

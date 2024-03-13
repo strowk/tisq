@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 pub(crate) struct Storage {
-    pub(super) store: Store,
+    files_root: PathBuf,
 }
 
 const SERVERS_BUCKET: &str = "servers";
@@ -25,7 +25,8 @@ pub(crate) struct NewServer {
 
 impl Storage {
     pub fn add_server(&mut self, server: NewServer) -> eyre::Result<()> {
-        let bucket = Self::get_servers_bucket(&self.store)?;
+        let store = self.get_store()?;
+        let bucket = Self::get_servers_bucket(&store)?;
         let id = Uuid::new_v4();
         let server = StoredServer {
             id,
@@ -38,13 +39,15 @@ impl Storage {
     }
 
     pub fn delete_server(&mut self, id: Uuid) -> eyre::Result<()> {
-        let bucket = Self::get_servers_bucket(&self.store)?;
+        let store = self.get_store()?;
+        let bucket = Self::get_servers_bucket(&store)?;
         bucket.remove(&Id(id))?;
         Ok(())
     }
 
     pub fn get_server(&self, id: Uuid) -> eyre::Result<Option<StoredServer>> {
-        let bucket = Self::get_servers_bucket(&self.store)?;
+        let store = self.get_store()?;
+        let bucket = Self::get_servers_bucket(&store)?;
         let server = bucket.get(&Id(id))?;
         let server = match server {
             Some(Json(server)) => Some(server),
@@ -54,8 +57,9 @@ impl Storage {
     }
 
     pub fn read_servers(&self) -> eyre::Result<Vec<StoredServer>> {
+        let store = self.get_store()?;
         // pub fn read_servers(bucket: Bucket<Id, Json<StoredServer>>) -> eyre::Result<Vec<StoredServer>> {
-        let servers: eyre::Result<Vec<StoredServer>> = Self::get_servers_bucket(&self.store)?
+        let servers: eyre::Result<Vec<StoredServer>> = Self::get_servers_bucket(&store)?
             .iter()
             .map(|item| {
                 let Json(server): Json<StoredServer> = item?.value()?;
@@ -71,14 +75,16 @@ impl Storage {
     }
 
     pub fn set_enabled_showing_pressed_key(&mut self, enabled: bool) -> eyre::Result<()> {
-        let bucket = self.store.bucket(Some("settings"))?;
+        let store = self.get_store()?;
+        let bucket = store.bucket(Some("settings"))?;
         let key = "show_pressed_key".to_string();
         bucket.set(&key, &Json(enabled))?;
         Ok(())
     }
 
     pub fn get_enabled_showing_pressed_key(&self) -> eyre::Result<bool> {
-        let bucket = self.store.bucket(Some("settings"))?;
+        let store = self.get_store()?;
+        let bucket = store.bucket(Some("settings"))?;
         let key = "show_pressed_key".to_string();
         let enabled: Option<Json<bool>> = bucket.get(&key)?;
         let enabled = match enabled {
@@ -86,6 +92,13 @@ impl Storage {
             _ => false,
         };
         Ok(enabled)
+    }
+
+    pub(crate) fn get_store(&self) -> eyre::Result<Store> {
+        let storage_path = self.files_root.join("storage");
+        let cfg = Config::new(storage_path);
+        let store = Store::new(cfg)?;
+        Ok(store)
     }
 
     pub fn open(files_root: &PathBuf) -> eyre::Result<Storage> {
@@ -96,8 +109,8 @@ impl Storage {
             fs::create_dir_all(&storage_path)?;
         }
 
-        let cfg = Config::new(storage_path);
-        let store = Store::new(cfg)?;
+        // let cfg = Config::new(storage_path);
+        // let store = Store::new(cfg)?;
 
         // let servers_bucket = Self::get_servers_bucket(&store)?;
         // let servers = Self::read_servers(servers_bucket)?;
@@ -107,7 +120,9 @@ impl Storage {
         // }
         // servers_bucket.get("")
 
-        Ok(Storage { store })
+        Ok(Storage {
+            files_root: files_root.clone(),
+        })
     }
 
     // fn (&self) {}

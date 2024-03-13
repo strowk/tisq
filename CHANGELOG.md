@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-WIP
+### Changed
+
+- Does not lock storage directory anymore during runtime, which allows running two instances of TisQ at the same time.
 
 ## [0.1.15] - 2024-03-12
 

@@ -56,7 +56,8 @@ impl Storage {
     }
 
     pub fn put_editor(&mut self, id: StoredEditorId, content: String) -> eyre::Result<()> {
-        let bucket = Self::get_editors_bucket(&self.store)?;
+        let store = self.get_store()?;
+        let bucket = Self::get_editors_bucket(&store)?;
         let editor = StoredEditor {
             server_id: id.server_id.clone(),
             database: id.database.clone(),
@@ -67,13 +68,15 @@ impl Storage {
     }
 
     pub fn delete_editor(&mut self, id: StoredEditorId) -> eyre::Result<()> {
-        let bucket = Self::get_editors_bucket(&self.store)?;
+        let store = self.get_store()?;
+        let bucket = Self::get_editors_bucket(&store)?;
         bucket.remove(&id)?;
         Ok(())
     }
 
     pub fn get_editor(&self, id: StoredEditorId) -> eyre::Result<Option<StoredEditor>> {
-        let bucket = Self::get_editors_bucket(&self.store)?;
+        let store = self.get_store()?;
+        let bucket = Self::get_editors_bucket(&store)?;
         let editor = bucket.get(&id)?;
         let editor = match editor {
             Some(Json(editor)) => Some(editor),
@@ -83,7 +86,8 @@ impl Storage {
     }
 
     pub fn read_editors(&self) -> eyre::Result<Vec<StoredEditor>> {
-        let editors: eyre::Result<Vec<StoredEditor>> = Self::get_editors_bucket(&self.store)?
+        let store = self.get_store()?;
+        let editors: eyre::Result<Vec<StoredEditor>> = Self::get_editors_bucket(&store)?
             .iter()
             .map(|item| {
                 let Json(editor): Json<StoredEditor> = item?.value()?;

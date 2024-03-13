@@ -250,4 +250,5 @@ tisq server add [name] [connection-url]
 - [ ] databases: Add support for MS SQL Server (via https://github.com/prisma/tiberius )
 - [ ] themes: Customizeable style by config TOML file
 - [ ] Customize keybindings in UI
+- [ ] web: Investigate if compatible with https://github.com/cryptool-org/wasm-webterm
 -

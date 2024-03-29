@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+WIP
+
+## [0.1.16] - 2024-03-29
+
 ### Added
 
 - Support for postgres types TIMESTAMP, TIMESTAMPTZ, DATE, TIME and TIMETZ.
@@ -176,7 +180,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Execution results view supporting only successful fetched results.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.15...HEAD
+[Unreleased]: https://github.com/strowk/tisq/compare/v0.1.16...HEAD
+[0.1.16]: https://github.com/strowk/tisq/compare/v0.1.15...v0.1.16
 [0.1.15]: https://github.com/strowk/tisq/compare/v0.1.14...v0.1.15
 [0.1.14]: https://github.com/strowk/tisq/compare/v0.1.13...v0.1.14
 [0.1.13]: https://github.com/strowk/tisq/compare/v0.1.12...v0.1.13

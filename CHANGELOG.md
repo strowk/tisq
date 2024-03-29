@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Support for UUID type.
 - Support for INET, CIDR and MACADDR types.
+- Support for BIT and VARBIT types.
 
 ## [0.1.16] - 2024-03-29
 

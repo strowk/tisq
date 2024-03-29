@@ -21,8 +21,9 @@ where
     sqlx::types::time::OffsetDateTime: sqlx::Type<D> + sqlx::Decode<'a, D>,
     sqlx::types::time::Date: sqlx::Type<D> + sqlx::Decode<'a, D>,
     sqlx::types::time::Time: sqlx::Type<D> + sqlx::Decode<'a, D>,
-
     sqlx::types::uuid::Uuid: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::ipnetwork::IpNetwork: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::mac_address::MacAddress: sqlx::Type<D> + sqlx::Decode<'a, D>,
 
     sqlx_postgres::types::PgTimeTz: sqlx::Type<D> + sqlx::Decode<'a, D>,
 
@@ -43,8 +44,9 @@ where
     Vec<sqlx::types::time::OffsetDateTime>: sqlx::Type<D> + sqlx::Decode<'a, D>,
     Vec<sqlx::types::time::Date>: sqlx::Type<D> + sqlx::Decode<'a, D>,
     Vec<sqlx::types::time::Time>: sqlx::Type<D> + sqlx::Decode<'a, D>,
-
     Vec<sqlx::types::uuid::Uuid>: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    Vec<sqlx::types::ipnetwork::IpNetwork>: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    Vec<sqlx::types::mac_address::MacAddress>: sqlx::Type<D> + sqlx::Decode<'a, D>,
 
     Vec<sqlx_postgres::types::PgTimeTz>: sqlx::Type<D> + sqlx::Decode<'a, D>,
 {
@@ -95,6 +97,12 @@ where
             return;
         }
         if Self::write_via_display::<sqlx::types::uuid::Uuid>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::ipnetwork::IpNetwork>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::mac_address::MacAddress>(type_info, row, i, data) {
             return;
         }
         data.push("not supported".to_string());
@@ -192,6 +200,8 @@ where
     sqlx::types::time::Time: sqlx::Type<D> + sqlx::Decode<'a, D>,
     sqlx_postgres::types::PgTimeTz: sqlx::Type<D> + sqlx::Decode<'a, D>,
     sqlx::types::uuid::Uuid: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::ipnetwork::IpNetwork: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::mac_address::MacAddress: sqlx::Type<D> + sqlx::Decode<'a, D>,
     (): sqlx::Type<D> + sqlx::Decode<'a, D>,
     usize: ColumnIndex<R>,
 {
@@ -247,6 +257,12 @@ where
         if Self::write_via_display::<sqlx::types::uuid::Uuid>(type_info, row, i, data) {
             return;
         }
+        if Self::write_via_display::<sqlx::types::ipnetwork::IpNetwork>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::mac_address::MacAddress>(type_info, row, i, data) {
+            return;
+        }
         tracing::debug!("Type not supported: {:?}", type_info);
         data.push("not supported".to_string());
 
@@ -256,15 +272,6 @@ where
         // PgMoney	MONEY
         // PgLTree	LTREE
         // PgLQuery	LQUERY
-
-        // Requires the uuid Cargo feature flag.
-
-        // uuid::Uuid	UUID
-
-        // Requires the ipnetwork Cargo feature flag.
-
-        //         ipnetwork::IpNetwork	INET, CIDR
-        // std::net::IpAddr	INET, CIDR
 
         // check more in https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html
     }

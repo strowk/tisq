@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-WIP
+### Added
+
+- Support for UUID type.
 
 ## [0.1.16] - 2024-03-29
 

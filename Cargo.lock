@@ -2022,6 +2022,7 @@ dependencies = [
  "time",
  "tracing",
  "url",
+ "uuid",
  "webpki-roots",
 ]
 
@@ -2105,6 +2106,7 @@ dependencies = [
  "thiserror",
  "time",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2147,6 +2149,7 @@ dependencies = [
  "thiserror",
  "time",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2171,6 +2174,7 @@ dependencies = [
  "time",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]

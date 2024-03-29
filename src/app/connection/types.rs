@@ -282,7 +282,7 @@ where
             return;
         }
         tracing::debug!("Type not supported: {:?}", type_info);
-        data.push( format!("not supported: {}", type_info.name()) );
+        data.push( format!("{} not supported", type_info.name()) );
 
         // TODO: Add support for other types
         // PgInterval	INTERVAL

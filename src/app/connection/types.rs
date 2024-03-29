@@ -246,8 +246,6 @@ where
         // PgLTree	LTREE
         // PgLQuery	LQUERY
 
-        // [PgTimeTz]	TIMETZ
-
         // Requires the uuid Cargo feature flag.
 
         // uuid::Uuid	UUID

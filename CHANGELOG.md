@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support for JSON and JSONB types.
 - Support for ENUM types.
 
+### Changed
+
+- Would print type name if type is not recognized.
+
 ## [0.1.16] - 2024-03-29
 
 ### Added

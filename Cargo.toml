@@ -57,7 +57,8 @@ features = [
     "uuid", 
     "ipnetwork", 
     "mac_address",
-    "bit-vec"
+    "bit-vec",
+    "json",
 ]
 
 

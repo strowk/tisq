@@ -25,6 +25,7 @@ where
     sqlx::types::ipnetwork::IpNetwork: sqlx::Type<D> + sqlx::Decode<'a, D>,
     sqlx::types::mac_address::MacAddress: sqlx::Type<D> + sqlx::Decode<'a, D>,
     sqlx::types::BitVec: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::JsonValue: sqlx::Type<D> + sqlx::Decode<'a, D>,
 
     sqlx_postgres::types::PgTimeTz: sqlx::Type<D> + sqlx::Decode<'a, D>,
 
@@ -49,6 +50,7 @@ where
     Vec<sqlx::types::ipnetwork::IpNetwork>: sqlx::Type<D> + sqlx::Decode<'a, D>,
     Vec<sqlx::types::mac_address::MacAddress>: sqlx::Type<D> + sqlx::Decode<'a, D>,
     Vec<sqlx::types::BitVec>: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    Vec<sqlx::types::JsonValue>: sqlx::Type<D> + sqlx::Decode<'a, D>,
 
     Vec<sqlx_postgres::types::PgTimeTz>: sqlx::Type<D> + sqlx::Decode<'a, D>,
 {
@@ -108,6 +110,9 @@ where
             return;
         }
         if Self::write_via_debug::<sqlx::types::BitVec>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::JsonValue>(type_info, row, i, data) {
             return;
         }
         data.push("not supported".to_string());
@@ -208,6 +213,7 @@ where
     sqlx::types::ipnetwork::IpNetwork: sqlx::Type<D> + sqlx::Decode<'a, D>,
     sqlx::types::mac_address::MacAddress: sqlx::Type<D> + sqlx::Decode<'a, D>,
     sqlx::types::BitVec: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::JsonValue: sqlx::Type<D> + sqlx::Decode<'a, D>,
     (): sqlx::Type<D> + sqlx::Decode<'a, D>,
     usize: ColumnIndex<R>,
 {
@@ -270,6 +276,9 @@ where
             return;
         }
         if Self::write_via_debug::<sqlx::types::BitVec>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::JsonValue>(type_info, row, i, data) {
             return;
         }
         tracing::debug!("Type not supported: {:?}", type_info);

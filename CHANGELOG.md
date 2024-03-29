@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Support for postgres types TIMESTAMP, TIMESTAMPTZ, DATE, TIME and TIMETZ.
+
 ### Changed
 
 - Does not lock storage directory anymore during runtime, which allows running two instances of TisQ at the same time.

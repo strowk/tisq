@@ -17,6 +17,12 @@ where
     f64: sqlx::Type<D>,
     Vec<u8>: sqlx::Type<D>,
     BigDecimal: sqlx::Type<D>,
+    sqlx::types::time::PrimitiveDateTime: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::time::OffsetDateTime: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::time::Date: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::time::Time: sqlx::Type<D> + sqlx::Decode<'a, D>,
+
+    sqlx_postgres::types::PgTimeTz: sqlx::Type<D> + sqlx::Decode<'a, D>,
 
     Vec<bool>: sqlx::Type<D> + sqlx::Decode<'a, D>,
     Vec<String>: sqlx::Type<D> + sqlx::Decode<'a, D>,
@@ -30,6 +36,13 @@ where
     Vec<BigDecimal>: sqlx::Type<D> + sqlx::Decode<'a, D>,
     // Vec<()>: sqlx::Type<D> + sqlx::Decode<'a, D>,
     usize: ColumnIndex<R>,
+
+    Vec<sqlx::types::time::PrimitiveDateTime>: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    Vec<sqlx::types::time::OffsetDateTime>: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    Vec<sqlx::types::time::Date>: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    Vec<sqlx::types::time::Time>: sqlx::Type<D> + sqlx::Decode<'a, D>,
+
+    Vec<sqlx_postgres::types::PgTimeTz>: sqlx::Type<D> + sqlx::Decode<'a, D>,
 {
     fn write_row_cell(type_info: &T, row: &'a R, i: usize, data: &mut Vec<String>) {
         if Self::write_via_display::<bool>(type_info, row, i, data) {
@@ -62,6 +75,21 @@ where
         if Self::write_via_debug::<Vec<u8>>(type_info, row, i, data) {
             return;
         }
+        if Self::write_via_display::<sqlx::types::time::PrimitiveDateTime>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::time::OffsetDateTime>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::time::Date>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::time::Time>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_custom_display::<sqlx_postgres::types::PgTimeTz>(type_info, row, i, data) {
+            return;
+        }
         data.push("not supported".to_string());
     }
 
@@ -76,6 +104,32 @@ where
             let val: Option<Vec<K>> = row.get::<Option<Vec<K>>, usize>(i);
             let val = val
                 .map(|val| format!("{:?}", val))
+                .unwrap_or_else(|| "null".to_string());
+            data.push(val);
+            return true;
+        }
+        false
+    }
+
+    fn write_via_custom_display<K>(type_info: &T, row: &'a R, i: usize, data: &mut Vec<String>) -> bool
+    where
+        Vec<K>: sqlx::Type<D>,
+        K: sqlx::Type<D>,
+        Vec<K>: sqlx::Decode<'a, D>,
+        K: CustomDisplay,
+    {
+        if <K as Type<D>>::compatible(type_info) {
+            let val: Option<Vec<K>> = row.get::<Option<Vec<K>>, usize>(i);
+            let val = val
+                .map(|val| {
+                    "[".to_string()
+                        + &val
+                            .iter()
+                            .map(|val_item| val_item.to_string())
+                            .collect::<Vec<String>>()
+                            .join(",")
+                        + "]"
+                })
                 .unwrap_or_else(|| "null".to_string());
             data.push(val);
             return true;
@@ -125,6 +179,11 @@ where
     f64: sqlx::Type<D> + sqlx::Decode<'a, D>,
     Vec<u8>: sqlx::Type<D> + sqlx::Decode<'a, D>,
     BigDecimal: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::time::PrimitiveDateTime: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::time::OffsetDateTime: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::time::Date: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx::types::time::Time: sqlx::Type<D> + sqlx::Decode<'a, D>,
+    sqlx_postgres::types::PgTimeTz: sqlx::Type<D> + sqlx::Decode<'a, D>,
     (): sqlx::Type<D> + sqlx::Decode<'a, D>,
     usize: ColumnIndex<R>,
 {
@@ -162,6 +221,21 @@ where
         if Self::write_via_debug::<()>(type_info, row, i, data) {
             return;
         }
+        if Self::write_via_display::<sqlx::types::time::PrimitiveDateTime>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::time::OffsetDateTime>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::time::Date>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_display::<sqlx::types::time::Time>(type_info, row, i, data) {
+            return;
+        }
+        if Self::write_via_custom_display::<sqlx_postgres::types::PgTimeTz>(type_info, row, i, data) {
+            return;
+        }
         tracing::debug!("Type not supported: {:?}", type_info);
         data.push("not supported".to_string());
 
@@ -172,14 +246,6 @@ where
         // PgLTree	LTREE
         // PgLQuery	LQUERY
 
-        // Requires the time Cargo feature flag.
-
-        // Rust type	Postgres type(s)
-        // Rust type	Postgres type(s)
-        // time::PrimitiveDateTime	TIMESTAMP
-        // time::OffsetDateTime	TIMESTAMPTZ
-        // time::Date	DATE
-        // time::Time	TIME
         // [PgTimeTz]	TIMETZ
 
         // Requires the uuid Cargo feature flag.
@@ -192,6 +258,23 @@ where
         // std::net::IpAddr	INET, CIDR
 
         // check more in https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html
+    }
+
+    fn write_via_custom_display<K>(type_info: &T, row: &'a R, i: usize, data: &mut Vec<String>) -> bool
+    where
+        K: sqlx::Type<D>,
+        K: sqlx::Decode<'a, D>,
+        K: CustomDisplay,
+    {
+        if <K as Type<D>>::compatible(type_info) {
+            let val: Option<K> = row.get::<Option<K>, usize>(i);
+            let val = val
+                .map(|val| val.to_string())
+                .unwrap_or_else(|| "null".to_string());
+            data.push(val);
+            return true;
+        }
+        false
     }
 
     fn write_via_debug<K>(type_info: &T, row: &'a R, i: usize, data: &mut Vec<String>) -> bool
@@ -226,5 +309,15 @@ where
             return true;
         }
         false
+    }
+}
+
+pub(super) trait CustomDisplay {
+    fn to_string(&self) -> String;
+}
+
+impl CustomDisplay for sqlx_postgres::types::PgTimeTz {
+    fn to_string(&self) -> String {
+        format!("{}{}", self.time, self.offset)
     }
 }

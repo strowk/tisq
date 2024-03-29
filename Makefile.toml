@@ -6,6 +6,36 @@ CACHE_FROM = { value = "type=local,src=../../docker-cache", condition = { env_no
     "CACHE_FROM",
 ] } }
 
+[tasks.perf-linux-target]
+condition = { files_not_exist = [
+    "${CARGO_MAKE_WORKING_DIRECTORY}/target/x86_64-unknown-linux-gnu/profiling",
+] }
+run_task = "build-linux_x86_64_profiling"
+
+[tasks.perf-build]
+dependencies = ["perf-linux-target"]
+command = "docker"
+# args = ["build", "-t", "tisq-perf", "-f", "perf/Dockerfile.wsl", "."]
+args = ["build", "-t", "tisq-perf", "-f", "perf/Dockerfile", "."]
+# args = ["build", "-t", "tisq-perf", "--build-arg", "PROFILE=debug", "-f", "perf/Dockerfile", "."]
+
+[tasks.perf-run]
+dependencies = ["perf-build"]
+command = "docker"
+args = [
+    "run",
+    "--rm",
+    "-ti",
+    # "--entrypoint", 
+    # "bash", 
+    "--privileged",
+    "--network",
+    "tisq",
+    "-v",
+    "${CARGO_MAKE_WORKING_DIRECTORY}/perf/.tisq:/root/.tisq",
+    "tisq-perf",
+]
+
 [tasks.install-changelog-lint-deps]
 script_runner = "@shell"
 cwd = "changelog"
@@ -79,30 +109,84 @@ dependencies = [
 command = "bash"
 args = [
     "-c",
-    "echo CARGO_BUILD_VERSION=${CARGO_MAKE_PROJECT_VERSION} >> $GITHUB_OUTPUT"
+    "echo CARGO_BUILD_VERSION=${CARGO_MAKE_PROJECT_VERSION} >> $GITHUB_OUTPUT",
 ]
 
 [tasks.build-docker-linux_x86_64]
 command = "docker"
-args = ["build", "--platform", "linux/amd64", "--build-arg", "TARGET=x86_64-unknown-linux-gnu", "-t", "tisq:amd64", "-f", "docker/Dockerfile.debian", "."]
+args = [
+    "build",
+    "--platform",
+    "linux/amd64",
+    "--build-arg",
+    "TARGET=x86_64-unknown-linux-gnu",
+    "-t",
+    "tisq:amd64",
+    "-f",
+    "docker/Dockerfile.debian",
+    ".",
+]
 
 [tasks.build-docker-linux_arm]
 command = "docker"
-args = ["build", "--platform", "linux/arm64", "--build-arg", "TARGET=aarch64-unknown-linux-gnu", "-t", "tisq:arm64", "-f", "docker/Dockerfile.debian", "."]
+args = [
+    "build",
+    "--platform",
+    "linux/arm64",
+    "--build-arg",
+    "TARGET=aarch64-unknown-linux-gnu",
+    "-t",
+    "tisq:arm64",
+    "-f",
+    "docker/Dockerfile.debian",
+    ".",
+]
 
 [tasks.build-docker-linux_x86_64_alpine]
 command = "docker"
-args = ["build", "--platform", "linux/amd64", "--build-arg", "TARGET=x86_64-unknown-linux-musl", "-t", "tisq:amd64-alpine", "-f", "docker/Dockerfile.alpine", "."]
+args = [
+    "build",
+    "--platform",
+    "linux/amd64",
+    "--build-arg",
+    "TARGET=x86_64-unknown-linux-musl",
+    "-t",
+    "tisq:amd64-alpine",
+    "-f",
+    "docker/Dockerfile.alpine",
+    ".",
+]
 
 [tasks.build-docker-linux_arm_alpine]
 command = "docker"
-args = ["build", "--platform", "linux/arm64", "--build-arg", "TARGET=aarch64-unknown-linux-musl", "-t", "tisq:arm64-alpine", "-f", "docker/Dockerfile.alpine", "."]
+args = [
+    "build",
+    "--platform",
+    "linux/arm64",
+    "--build-arg",
+    "TARGET=aarch64-unknown-linux-musl",
+    "-t",
+    "tisq:arm64-alpine",
+    "-f",
+    "docker/Dockerfile.alpine",
+    ".",
+]
 
 # Building binaries for linux
 
 [tasks.build-linux_x86_64]
 command = "cross"
 args = ["build", "--target", "x86_64-unknown-linux-gnu", "--release"]
+
+[tasks.build-linux_x86_64_profiling]
+command = "cross"
+args = [
+    "build",
+    "--target",
+    "x86_64-unknown-linux-gnu",
+    "--profile",
+    "profiling",
+]
 
 [tasks.build-linux_arm]
 command = "cross"

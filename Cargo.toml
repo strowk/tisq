@@ -50,3 +50,9 @@ dirs = "5.0.1"
 [dependencies.uuid]
 features = ["v4", "fast-rng", "serde"]
 version = "1.4.1"
+
+# Should be useful for analyzing profiling data
+[profile.profiling]
+inherits = "release"
+debug = 1
+split-debuginfo = 'off'

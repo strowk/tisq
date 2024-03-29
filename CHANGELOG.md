@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support for BIT and VARBIT types.
 - Support for JSON and JSONB types.
 - Support for ENUM types.
+- Support for user defined types (except if nested).
 
 ### Changed
 

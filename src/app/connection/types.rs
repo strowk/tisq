@@ -85,7 +85,8 @@ where
         if Self::write_via_debug::<Vec<u8>>(type_info, row, i, data) {
             return;
         }
-        if Self::write_via_display::<sqlx::types::time::PrimitiveDateTime>(type_info, row, i, data) {
+        if Self::write_via_display::<sqlx::types::time::PrimitiveDateTime>(type_info, row, i, data)
+        {
             return;
         }
         if Self::write_via_display::<sqlx::types::time::OffsetDateTime>(type_info, row, i, data) {
@@ -97,7 +98,8 @@ where
         if Self::write_via_display::<sqlx::types::time::Time>(type_info, row, i, data) {
             return;
         }
-        if Self::write_via_custom_display::<sqlx_postgres::types::PgTimeTz>(type_info, row, i, data) {
+        if Self::write_via_custom_display::<sqlx_postgres::types::PgTimeTz>(type_info, row, i, data)
+        {
             return;
         }
         if Self::write_via_display::<sqlx::types::uuid::Uuid>(type_info, row, i, data) {
@@ -106,7 +108,8 @@ where
         if Self::write_via_display::<sqlx::types::ipnetwork::IpNetwork>(type_info, row, i, data) {
             return;
         }
-        if Self::write_via_display::<sqlx::types::mac_address::MacAddress>(type_info, row, i, data) {
+        if Self::write_via_display::<sqlx::types::mac_address::MacAddress>(type_info, row, i, data)
+        {
             return;
         }
         if Self::write_via_debug::<sqlx::types::BitVec>(type_info, row, i, data) {
@@ -136,7 +139,12 @@ where
         false
     }
 
-    fn write_via_custom_display<K>(type_info: &T, row: &'a R, i: usize, data: &mut Vec<String>) -> bool
+    fn write_via_custom_display<K>(
+        type_info: &T,
+        row: &'a R,
+        i: usize,
+        data: &mut Vec<String>,
+    ) -> bool
     where
         Vec<K>: sqlx::Type<D>,
         K: sqlx::Type<D>,
@@ -251,7 +259,8 @@ where
         if Self::write_via_debug::<()>(type_info, row, i, data) {
             return;
         }
-        if Self::write_via_display::<sqlx::types::time::PrimitiveDateTime>(type_info, row, i, data) {
+        if Self::write_via_display::<sqlx::types::time::PrimitiveDateTime>(type_info, row, i, data)
+        {
             return;
         }
         if Self::write_via_display::<sqlx::types::time::OffsetDateTime>(type_info, row, i, data) {
@@ -263,7 +272,8 @@ where
         if Self::write_via_display::<sqlx::types::time::Time>(type_info, row, i, data) {
             return;
         }
-        if Self::write_via_custom_display::<sqlx_postgres::types::PgTimeTz>(type_info, row, i, data) {
+        if Self::write_via_custom_display::<sqlx_postgres::types::PgTimeTz>(type_info, row, i, data)
+        {
             return;
         }
         if Self::write_via_display::<sqlx::types::uuid::Uuid>(type_info, row, i, data) {
@@ -272,7 +282,8 @@ where
         if Self::write_via_display::<sqlx::types::ipnetwork::IpNetwork>(type_info, row, i, data) {
             return;
         }
-        if Self::write_via_display::<sqlx::types::mac_address::MacAddress>(type_info, row, i, data) {
+        if Self::write_via_display::<sqlx::types::mac_address::MacAddress>(type_info, row, i, data)
+        {
             return;
         }
         if Self::write_via_debug::<sqlx::types::BitVec>(type_info, row, i, data) {
@@ -282,7 +293,7 @@ where
             return;
         }
         tracing::debug!("Type not supported: {:?}", type_info);
-        data.push( format!("{} not supported", type_info.name()) );
+        data.push(format!("{} not supported", type_info.name()));
 
         // TODO: Add support for other types
         // PgInterval	INTERVAL
@@ -294,7 +305,12 @@ where
         // check more in https://docs.rs/sqlx-postgres/0.7.2/sqlx_postgres/types/index.html
     }
 
-    fn write_via_custom_display<K>(type_info: &T, row: &'a R, i: usize, data: &mut Vec<String>) -> bool
+    fn write_via_custom_display<K>(
+        type_info: &T,
+        row: &'a R,
+        i: usize,
+        data: &mut Vec<String>,
+    ) -> bool
     where
         K: sqlx::Type<D>,
         K: sqlx::Decode<'a, D>,
@@ -345,6 +361,7 @@ where
         false
     }
 }
+
 
 pub(super) trait CustomDisplay {
     fn to_string(&self) -> String;

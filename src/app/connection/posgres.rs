@@ -68,9 +68,22 @@ impl Executing for PgConnection {
                             tracing::debug!("Composite type not supported: {}", type_info.name());
                             data.push("not supported".to_string());
                         }
-                        PgTypeKind::Enum(_) => {
-                            tracing::debug!("Enum type not supported: {}", type_info.name());
-                            data.push("not supported".to_string());
+                        PgTypeKind::Enum(enum_values) => {
+                            match row.try_get_raw(i) {
+                                Ok(value) => {
+                                    match value.as_str() {
+                                        Ok(value) => data.push(value.to_string()),
+                                        Err(e) => {
+                                            tracing::debug!("Error getting enum value: {} {:?} {}", type_info.name(), enum_values, e);
+                                            data.push("not supported".to_string());
+                                        }
+                                    }
+                                }
+                                Err(e) => {
+                                    tracing::debug!("Error getting enum value: {} {:?} {}", type_info.name(), enum_values, e);
+                                    data.push("not supported".to_string());
+                                }
+                            }
                         }
                         PgTypeKind::Range(_) => {
                             tracing::debug!("Range type not supported: {}", type_info.name());

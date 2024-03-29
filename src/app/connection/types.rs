@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display};
 
-use sqlx::{types::BigDecimal, ColumnIndex, Row, Type};
+use sqlx::{types::BigDecimal, ColumnIndex, Row, Type, TypeInfo};
 
 pub(super) trait GenericArrayTypeWriter<'a, T, R, D>
 where
@@ -193,7 +193,7 @@ pub(super) trait GenericTypeWriter<'a, T, R, D>
 where
     R: Row<Database = D>,
     D: sqlx::Database<TypeInfo = T>,
-    T: Debug,
+    T: Debug + TypeInfo,
     bool: sqlx::Type<D> + sqlx::Decode<'a, D>,
     String: sqlx::Type<D> + sqlx::Decode<'a, D>,
     i8: sqlx::Type<D> + sqlx::Decode<'a, D>,
@@ -282,7 +282,7 @@ where
             return;
         }
         tracing::debug!("Type not supported: {:?}", type_info);
-        data.push("not supported".to_string());
+        data.push( format!("not supported: {}", type_info.name()) );
 
         // TODO: Add support for other types
         // PgInterval	INTERVAL
